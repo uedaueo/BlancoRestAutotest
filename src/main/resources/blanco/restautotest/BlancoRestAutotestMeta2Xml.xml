@@ -1,0 +1,422 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- blancoCalcParser define file for autotest -->
+<blanco version="0.1.0">
+    <target name="blancoCalcParser">
+        <blancocalcparser name="autotest">
+
+            <propertyblock name="autotest-testcase-common" waitY="1">
+                <startstring>BLANCO-REST-AUTOTESTテストケース・共通</startstring>
+                <propertykey name="name" waitX="2">
+                    <value>テストクラス名基部</value>
+                </propertykey>
+                <propertykey name="package" waitX="2">
+                    <value>パッケージ</value>
+                </propertykey>
+                <propertykey name="description" waitX="2">
+                    <value>説明</value>
+                </propertykey>
+                <propertykey name="requestHeaderImple" waitX="2">
+                    <value>リクエストヘッダ情報実装クラス</value>
+                </propertykey>
+            </propertyblock>
+
+            <propertyblock name="autotest-testcase-extends" waitY="1">
+                <startstring>BLANCO-REST-AUTOTESTテストケース・継承</startstring>
+                <propertykey name="superClass" waitX="2">
+                    <value>クラス名</value>
+                </propertykey>
+                <propertykey name="package" waitX="2">
+                    <value>パッケージ</value>
+                </propertykey>
+            </propertyblock>
+
+            <tableblock name="autotest-testcase-list" waitY="3" titleheight="4" rowname="case">
+                <startstring>BLANCO-REST-AUTOTESTテストケース・一覧</startstring>
+
+                <tablecolumn name="no">
+                    <value>№</value>
+                </tablecolumn>
+                <tablecolumn name="caseTitle">
+                    <value>テスト内容</value>
+                </tablecolumn>
+                <tablecolumn name="precondition">
+                    <value>Precondition</value>
+                </tablecolumn>
+                <tablecolumn name="api">
+                    <value>Api</value>
+                </tablecolumn>
+                <tablecolumn name="method">
+                    <value>Method</value>
+                </tablecolumn>
+                <tablecolumn name="refreshToken">
+                    <value>Token更新</value>
+                </tablecolumn>
+                <tablecolumn name="sqlScript">
+                    <value>SQL（実行型）</value>
+                </tablecolumn>
+                <tablecolumn name="preScript">
+                    <value>Pre-SCRIPT</value>
+                </tablecolumn>
+                <tablecolumn name="postScript">
+                    <value>Post-SCRIPT</value>
+                </tablecolumn>
+                <tablecolumn name="searchString">
+                    <value>検知文字列</value>
+                </tablecolumn>
+                <tablecolumn name="onDetect">
+                    <value>検知時動作</value>
+                </tablecolumn>
+                <tablecolumn name="targetCase">
+                    <value>使用ケース</value>
+                </tablecolumn>
+                <tablecolumn name="screenId">
+                    <value>screenId</value>
+                </tablecolumn>
+                <tablecolumn name="shopId">
+                    <value>shopId</value>
+                </tablecolumn>
+                <tablecolumn name="lang">
+                    <value>lang</value>
+                </tablecolumn>
+                <tablecolumn name="timezone">
+                    <value>tz</value>
+                </tablecolumn>
+                <tablecolumn name="currency">
+                    <value>currency</value>
+                </tablecolumn>
+                <tablecolumn name="version">
+                    <value>version</value>
+                </tablecolumn>
+                <tablecolumn name="time">
+                    <value>time</value>
+                </tablecolumn>
+                <tablecolumn name="result">
+                    <value>result</value>
+                </tablecolumn>
+                <tablecolumn name="errorCode">
+                    <value>e.code</value>
+                </tablecolumn>
+                <tablecolumn name="errorMesssage">
+                    <value>e.messsage</value>
+                </tablecolumn>
+                <tablecolumn name="errorMesssageNumber">
+                    <value>e.messsageNumber</value>
+                </tablecolumn>
+                <tablecolumn name="messageCode">
+                    <value>m.code</value>
+                </tablecolumn>
+                <tablecolumn name="messsageMessage">
+                    <value>m.messsage</value>
+                </tablecolumn>
+                <tablecolumn name="messsageNumber">
+                    <value>m.messsageNumber</value>
+                </tablecolumn>
+                <tablecolumn name="Bikou">
+                    <value>備考</value>
+                </tablecolumn>
+
+                <valuemapping>
+                    <result>true</result>
+                    <source>合格</source>
+                </valuemapping>
+
+                <valuemapping>
+                    <result>false</result>
+                    <source>不合格</source>
+                </valuemapping>
+
+            </tableblock>
+
+            <propertyblock name="autotest-InputResult-common" waitY="1">
+                <startstring>BLANCO-REST-AUTOTEST入出力定義・共通</startstring>
+                <propertykey name="name" waitX="2">
+                    <value>電文クラス名</value>
+                </propertykey>
+                <propertykey name="package" waitX="2">
+                    <value>パッケージ</value>
+                </propertykey>
+                <propertykey name="description" waitX="2">
+                    <value>説明</value>
+                </propertykey>
+                <propertykey name="method" waitX="2">
+                    <value>電文のMETHOD</value>
+                </propertykey>
+            </propertyblock>
+
+            <tableblock name="autotest-InputResult-list" waitY="1" titleheight="2" rowname="InputResult">
+                <startstring>BLANCO-REST-AUTOTEST入出力定義・一覧</startstring>
+
+                <tablecolumn name="InputNo">
+                    <value>番号</value>
+                </tablecolumn>
+
+                <tablecolumn name="kind">
+                    <value>種別</value>
+                </tablecolumn>
+
+                <tablecolumn name="case">
+                    <value>ケース</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input1">
+                    <value>Input1</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input2">
+                    <value>Input2</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input3">
+                    <value>Input3</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input4">
+                    <value>Input4</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input5">
+                    <value>Input5</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input6">
+                    <value>Input6</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input7">
+                    <value>Input7</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input8">
+                    <value>Input8</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input9">
+                    <value>Input9</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input10">
+                    <value>Input10</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input11">
+                    <value>Input11</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input12">
+                    <value>Input12</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input13">
+                    <value>Input13</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input14">
+                    <value>Input14</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input15">
+                    <value>Input15</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input16">
+                    <value>Input16</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input17">
+                    <value>Input17</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input18">
+                    <value>Input18</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input19">
+                    <value>Input19</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input20">
+                    <value>Input20</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input21">
+                    <value>Input21</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input22">
+                    <value>Input22</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input23">
+                    <value>Input23</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input24">
+                    <value>Input24</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input25">
+                    <value>Input25</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input26">
+                    <value>Input26</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input27">
+                    <value>Input27</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input28">
+                    <value>Input28</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input29">
+                    <value>Input29</value>
+                </tablecolumn>
+
+                <tablecolumn name="Input30">
+                    <value>Input30</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect1">
+                    <value>Expect1</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect2">
+                    <value>Expect2</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect3">
+                    <value>Expect3</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect4">
+                    <value>Expect4</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect5">
+                    <value>Expect5</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect6">
+                    <value>Expect6</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect7">
+                    <value>Expect7</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect8">
+                    <value>Expect8</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect9">
+                    <value>Expect9</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect10">
+                    <value>Expect10</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect11">
+                    <value>Expect11</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect12">
+                    <value>Expect12</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect13">
+                    <value>Expect13</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect14">
+                    <value>Expect14</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect15">
+                    <value>Expect15</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect16">
+                    <value>Expect16</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect17">
+                    <value>Expect17</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect18">
+                    <value>Expect18</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect19">
+                    <value>Expect19</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect20">
+                    <value>Expect20</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect21">
+                    <value>Expect21</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect22">
+                    <value>Expect22</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect23">
+                    <value>Expect23</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect24">
+                    <value>Expect24</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect25">
+                    <value>Expect25</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect26">
+                    <value>Expect26</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect27">
+                    <value>Expect27</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect28">
+                    <value>Expect28</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect29">
+                    <value>Expect29</value>
+                </tablecolumn>
+
+                <tablecolumn name="Expect30">
+                    <value>Expect30</value>
+                </tablecolumn>
+
+                <valuemapping>
+                    <result>property</result>
+                    <source>プロパティ</source>
+                </valuemapping>
+                <valuemapping>
+                    <result>property</result>
+                    <source>パラメータ</source>
+                </valuemapping>
+                <valuemapping>
+                    <result>assert</result>
+                    <source>比較方法</source>
+                </valuemapping>
+                <valuemapping>
+                    <result>value</result>
+                    <source>値</source>
+                </valuemapping>
+
+            </tableblock>
+
+        </blancocalcparser>
+    </target>
+</blanco>

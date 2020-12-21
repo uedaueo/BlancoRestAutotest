@@ -21,3 +21,20 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+
+.svn
+.classpath
+.project
+.idea
+.DS_Store
+*.iml
+/blancoValueObject-*-src.zip
+/bin/
+/tmp/
+/tmpTest/
+/tmpTest2/
+/tmpTest3/
+/sample/
+/target/
+/classes
+~$*
