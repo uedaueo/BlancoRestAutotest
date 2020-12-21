@@ -7,78 +7,132 @@ import blanco.restgenerator.valueobject.ApiTelegram;
  */
 public class BlancoRestAutotestTestCaseData {
     /**
-     * テストケースの入出力を格納します。
+     * テストケースの入力値を格納します。
      *
-     * フィールド: [telegram]。
+     * フィールド: [input]。
      */
-    private ApiTelegram fTelegram;
+    private ApiTelegram fInput;
 
     /**
      * 電文クラスの正式名を格納します。
      *
-     * フィールド: [name]。
+     * フィールド: [inputId]。
      */
-    private String fName;
+    private String fInputId;
 
     /**
+     * テストケースの出力値を格納します。
+     *
+     * フィールド: [expect]。
+     */
+    private ApiTelegram fExpect;
+
+    /**
+     * 電文クラスの正式名を格納します。
+     *
+     * フィールド: [expectId]。
+     */
+    private String fExpectId;
+
+    /**
+     * テストケースIDを格納します。
+     *
      * フィールド: [caseId]。
      */
     private String fCaseId;
 
     /**
-     * テストケースの定義書上の行数を格納します。
+     * フィールド [input] の値を設定します。
      *
-     * フィールド: [caseLineNum]。
-     * デフォルト: [0]。
+     * フィールドの説明: [テストケースの入力値を格納します。]。
+     *
+     * @param argInput フィールド[input]に設定する値。
      */
-    private Integer fCaseLineNum = 0;
-
-    /**
-     * フィールド [telegram] の値を設定します。
-     *
-     * フィールドの説明: [テストケースの入出力を格納します。]。
-     *
-     * @param argTelegram フィールド[telegram]に設定する値。
-     */
-    public void setTelegram(final ApiTelegram argTelegram) {
-        fTelegram = argTelegram;
+    public void setInput(final ApiTelegram argInput) {
+        fInput = argInput;
     }
 
     /**
-     * フィールド [telegram] の値を取得します。
+     * フィールド [input] の値を取得します。
      *
-     * フィールドの説明: [テストケースの入出力を格納します。]。
+     * フィールドの説明: [テストケースの入力値を格納します。]。
      *
-     * @return フィールド[telegram]から取得した値。
+     * @return フィールド[input]から取得した値。
      */
-    public ApiTelegram getTelegram() {
-        return fTelegram;
+    public ApiTelegram getInput() {
+        return fInput;
     }
 
     /**
-     * フィールド [name] の値を設定します。
+     * フィールド [inputId] の値を設定します。
      *
      * フィールドの説明: [電文クラスの正式名を格納します。]。
      *
-     * @param argName フィールド[name]に設定する値。
+     * @param argInputId フィールド[inputId]に設定する値。
      */
-    public void setName(final String argName) {
-        fName = argName;
+    public void setInputId(final String argInputId) {
+        fInputId = argInputId;
     }
 
     /**
-     * フィールド [name] の値を取得します。
+     * フィールド [inputId] の値を取得します。
      *
      * フィールドの説明: [電文クラスの正式名を格納します。]。
      *
-     * @return フィールド[name]から取得した値。
+     * @return フィールド[inputId]から取得した値。
      */
-    public String getName() {
-        return fName;
+    public String getInputId() {
+        return fInputId;
+    }
+
+    /**
+     * フィールド [expect] の値を設定します。
+     *
+     * フィールドの説明: [テストケースの出力値を格納します。]。
+     *
+     * @param argExpect フィールド[expect]に設定する値。
+     */
+    public void setExpect(final ApiTelegram argExpect) {
+        fExpect = argExpect;
+    }
+
+    /**
+     * フィールド [expect] の値を取得します。
+     *
+     * フィールドの説明: [テストケースの出力値を格納します。]。
+     *
+     * @return フィールド[expect]から取得した値。
+     */
+    public ApiTelegram getExpect() {
+        return fExpect;
+    }
+
+    /**
+     * フィールド [expectId] の値を設定します。
+     *
+     * フィールドの説明: [電文クラスの正式名を格納します。]。
+     *
+     * @param argExpectId フィールド[expectId]に設定する値。
+     */
+    public void setExpectId(final String argExpectId) {
+        fExpectId = argExpectId;
+    }
+
+    /**
+     * フィールド [expectId] の値を取得します。
+     *
+     * フィールドの説明: [電文クラスの正式名を格納します。]。
+     *
+     * @return フィールド[expectId]から取得した値。
+     */
+    public String getExpectId() {
+        return fExpectId;
     }
 
     /**
      * フィールド [caseId] の値を設定します。
+     *
+     * フィールドの説明: [テストケースIDを格納します。]。
      *
      * @param argCaseId フィールド[caseId]に設定する値。
      */
@@ -89,33 +143,12 @@ public class BlancoRestAutotestTestCaseData {
     /**
      * フィールド [caseId] の値を取得します。
      *
+     * フィールドの説明: [テストケースIDを格納します。]。
+     *
      * @return フィールド[caseId]から取得した値。
      */
     public String getCaseId() {
         return fCaseId;
-    }
-
-    /**
-     * フィールド [caseLineNum] の値を設定します。
-     *
-     * フィールドの説明: [テストケースの定義書上の行数を格納します。]。
-     *
-     * @param argCaseLineNum フィールド[caseLineNum]に設定する値。
-     */
-    public void setCaseLineNum(final Integer argCaseLineNum) {
-        fCaseLineNum = argCaseLineNum;
-    }
-
-    /**
-     * フィールド [caseLineNum] の値を取得します。
-     *
-     * フィールドの説明: [テストケースの定義書上の行数を格納します。]。
-     * デフォルト: [0]。
-     *
-     * @return フィールド[caseLineNum]から取得した値。
-     */
-    public Integer getCaseLineNum() {
-        return fCaseLineNum;
     }
 
     /**
@@ -133,10 +166,11 @@ public class BlancoRestAutotestTestCaseData {
     public String toString() {
         final StringBuffer buf = new StringBuffer();
         buf.append("blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData[");
-        buf.append("telegram=" + fTelegram);
-        buf.append(",name=" + fName);
+        buf.append("input=" + fInput);
+        buf.append(",inputId=" + fInputId);
+        buf.append(",expect=" + fExpect);
+        buf.append(",expectId=" + fExpectId);
         buf.append(",caseId=" + fCaseId);
-        buf.append(",caseLineNum=" + fCaseLineNum);
         buf.append("]");
         return buf.toString();
     }
@@ -159,17 +193,20 @@ public class BlancoRestAutotestTestCaseData {
 
         // No needs to copy parent class.
 
-        // Name: fTelegram
+        // Name: fInput
         // Type: blanco.restgenerator.valueobject.ApiTelegram
-        // フィールド[fTelegram]はサポート外の型[blanco.restgenerator.valueobject.ApiTelegram]です。
-        // Name: fName
+        // フィールド[fInput]はサポート外の型[blanco.restgenerator.valueobject.ApiTelegram]です。
+        // Name: fInputId
         // Type: java.lang.String
-        target.fName = this.fName;
+        target.fInputId = this.fInputId;
+        // Name: fExpect
+        // Type: blanco.restgenerator.valueobject.ApiTelegram
+        // フィールド[fExpect]はサポート外の型[blanco.restgenerator.valueobject.ApiTelegram]です。
+        // Name: fExpectId
+        // Type: java.lang.String
+        target.fExpectId = this.fExpectId;
         // Name: fCaseId
         // Type: java.lang.String
         target.fCaseId = this.fCaseId;
-        // Name: fCaseLineNum
-        // Type: java.lang.Integer
-        target.fCaseLineNum = this.fCaseLineNum;
     }
 }

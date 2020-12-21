@@ -7,11 +7,14 @@ import blanco.restautotest.constants.BlancoRestAutotestConstants;
 import blanco.restautotest.message.BlancoRestAutotestMessage;
 import blanco.restautotest.meta2xml.BlancoRestAutotestMeta2Xml;
 import blanco.restautotest.task.valueobject.BlancoRestAutotestProcessInput;
+import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 
 import javax.xml.transform.TransformerException;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * テストケース生成処理
@@ -113,6 +116,7 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
 
             BlancoRestAutotestUtil.isVerbose = input.getVerbose();
 
+            List<BlancoRestAutotestTestCaseData> allTestCaseDataList = new ArrayList<>();
             for (int index = 0; index < fileMeta2.length; index++) {
                 if (fileMeta2[index].getName().endsWith(".xml") == false) {
                     continue;
@@ -120,16 +124,26 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
 
                 // 一旦、すべての XML を parse する
                 //中間XMLファイルのXMLドキュメントをパースしClassStructureを取得
-                new BlancoRestAutotestXmlParser()
+                List<BlancoRestAutotestTestCaseData> testCaseDataList = new BlancoRestAutotestXmlParser()
                         .parseTestCase(fileMeta2[index]);
+                if (testCaseDataList != null) {
+                    allTestCaseDataList.addAll(testCaseDataList);
+                }
             }
+
+            /*
+             * TODO
+             * inputResult は複数のシートでそれぞれ設定されている可能性があります。
+             * caseId が重複していた場合はエラーとします。
+             * さらに、その caseId を使用している TestCase 情報を表示して処理を終了します。
+             */
 
             // ソースコードを生成する
             final BlancoRestAutotestXml2JavaClass xml2JavaClass = new BlancoRestAutotestXml2JavaClass();
             xml2JavaClass.setEncoding(input.getEncoding());
             xml2JavaClass.setVerbose(input.getVerbose());
             xml2JavaClass.setTargetStyleAdvanced(isTargetStyleAdvanced);
-            xml2JavaClass.process(new File(strTarget));
+            xml2JavaClass.process(new File(strTarget), allTestCaseDataList);
 
         } catch (TransformerException e) {
             throw new IOException("XML変換の過程で例外が発生しました: " + e.toString());

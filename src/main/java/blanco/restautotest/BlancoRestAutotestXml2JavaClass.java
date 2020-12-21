@@ -17,7 +17,10 @@ import blanco.restautotest.constants.BlancoRestAutotestConstants;
 import blanco.restautotest.message.BlancoRestAutotestMessage;
 import blanco.restautotest.resourcebundle.BlancoRestAutotestResourceBundle;
 import blanco.restautotest.valueobject.BlancoRestAutotestInputResultFieldStructure;
+import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseFieldStructure;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
 import java.io.IOException;
@@ -107,10 +110,27 @@ public class BlancoRestAutotestXml2JavaClass {
      *             入出力例外が発生した場合
      */
     public void process(
-            final File argDirectoryTarget) throws IOException, NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+            final File argDirectoryTarget, final List<BlancoRestAutotestTestCaseData> argAllTestCaseData) throws IOException {
 
         // 得られた情報からJavaソースコードを生成します。
-//        structure2Source(argDirectoryTarget);
+        testCaseData2Json(argDirectoryTarget, argAllTestCaseData);
+    }
+
+    public void testCaseData2Json(
+            final File argDirectoryTarget,
+            final List<BlancoRestAutotestTestCaseData> argAllTestCaseData
+    ) throws JsonProcessingException {
+        // 従来と互換性を持たせるため、/mainサブフォルダに出力します。
+        final File fileBlancoMain = new File(argDirectoryTarget.getAbsolutePath());
+
+        /* tueda DEBUG */
+        System.out.println("testCaseData2Json : " + fileBlancoMain.getAbsolutePath());
+
+        for (BlancoRestAutotestTestCaseData testCaseData : argAllTestCaseData) {
+            ObjectMapper mapper = new ObjectMapper();
+            String requestJson = mapper.writeValueAsString(testCaseData.getInput());
+            System.out.println("JSON: " + requestJson);
+        }
     }
 
  /**

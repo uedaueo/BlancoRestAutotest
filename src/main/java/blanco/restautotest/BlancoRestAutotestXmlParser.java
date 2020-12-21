@@ -14,7 +14,10 @@ import blanco.xml.bind.valueobject.BlancoXmlElement;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -36,12 +39,12 @@ public class BlancoRestAutotestXmlParser {
      * @param argMetaXmlSourceFile
      *            中間XMLファイル。
      */
-    public void parseTestCase(
+    public List<BlancoRestAutotestTestCaseData> parseTestCase(
             final File argMetaXmlSourceFile) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
         final BlancoXmlDocument documentMeta = new BlancoXmlUnmarshaller()
                 .unmarshal(argMetaXmlSourceFile);
         if (documentMeta == null) {
-            return;
+            return null;
         }
 
         // ルートエレメントを取得します。
@@ -49,13 +52,17 @@ public class BlancoRestAutotestXmlParser {
                 .getDocumentElement(documentMeta);
         if (elementRoot == null) {
             // ルートエレメントが無い場合には処理中断します。
-            return;
+            return null;
         }
 
-        // まずはじめに、全ての TestCase を parse します。
-        parseTestCase(elementRoot);
-        // 次に、全ての InputResult を parse します。
-        parseInputResult(elementRoot);
+        /*
+         * BlancoRestAutotest では TestCase のパースはしません。
+         * TestCaseのパースにはAPIヘッダの解析が必須であり、それは アプリケーション毎に
+         * 違う可能性があるからです。
+         */
+//        parseTestCase(elementRoot);
+        //  次に、全ての InputResult を parse します。
+        return parseInputResult(elementRoot);
     }
 
     /**
@@ -97,7 +104,9 @@ public class BlancoRestAutotestXmlParser {
      *
      * @param argElementRoot
      */
-    public void parseInputResult(final BlancoXmlElement argElementRoot) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+    public List<BlancoRestAutotestTestCaseData> parseInputResult(final BlancoXmlElement argElementRoot) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+
+        List<BlancoRestAutotestTestCaseData> testCaseDataList = new ArrayList<>();
 
         // sheet(Excelシート)のリストを取得します。
         final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
@@ -118,6 +127,7 @@ public class BlancoRestAutotestXmlParser {
 
             if (inputResultClassStructure != null) {
                 System.out.println("InputResult class: " + inputResultClassStructure.getName());
+
                 /*
                  * Input?/Expected? ごとに入っているはずのプロパティリストを
                  * property.property.property という書式で保持する
@@ -137,64 +147,15 @@ public class BlancoRestAutotestXmlParser {
                  * テストケースの入出力値を読み取る
                  */
                 String requestId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Request";
-                List<BlancoRestAutotestTestCaseData> testCaseDataList = new ArrayList<>();
+                String responseId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Response";
 
-                this.readInputResultValue(requestId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
-//
-//
-//                String responseId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Response";
-//                BlancoRestAutotestTestCaseData caseDataExpect = this.createCaseDataInstance(
-//                        responseId,
-//                        propertyMap,
-//                        "Expect",
-//                        BlancoRestAutotestUtil.expectedColumnMax
-//                );
-//
-//                /*
-//                 * プロパティを取得します。
-//                 * 「プロパティ」種別は先頭にしか定義しない前提とします。
-//                 */
-//                for (BlancoRestAutotestInputResultFieldStructure fieldStructure : inputResultClassStructure.getInputResultFieldList()) {
-//                    if (!fieldStructure.getKind().equals(BlancoRestAutotestConstants.INPUT_RESULT_KIND_PROPERTY)) {
-//                        break;
-//                    }
-//
-//
-//                }
-//
-//                /*
-//                 * inputResult は複数のシートでそれぞれ設定されている可能性があります。
-//                 * caseId が重複していた場合はエラーとします。
-//                 * さらに、その caseId を使用している TestCase 情報を表示して処理を終了します。
-//                 */
-//                BlancoRestAutotestInputResultClassStructure irExist = BlancoRestAutotestUtil.inputResults.get(inputResultClassStructure.getName());
-//                if (irExist != null) {
-//                    /* caseId に重複がないかチェックする */
-//                    for (BlancoRestAutotestInputResultFieldStructure fieldStructure : inputResultClassStructure.getInputResultFieldList()) {
-//                        String caseId = BlancoStringUtil.null2Blank(fieldStructure.getCaseId());
-//                        if (caseId.length() == 0) {
-//                            continue;
-//                        }
-//                        for (BlancoRestAutotestInputResultFieldStructure fieldStructureEx : irExist.getInputResultFieldList()) {
-//                            String caseIdEx = BlancoStringUtil.null2Blank(fieldStructureEx.getCaseId());
-//                            if (caseIdEx.length() == 0) {
-//                                continue;
-//                            }
-//                            if (caseId.equals(caseIdEx)) {
-//                                // 重複した caseId を発見
-//
-//                            }
-//                        }
-//
-//                    }
-//                } else {
-//                    irExist = inputResultClassStructure;
-//                }
-//                BlancoRestAutotestUtil.inputResults.put(irExist.getName(), irExist);
+                this.readInputResultValue(requestId, responseId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
+
             } else {
-//                System.out.println("!!! InputResult is null");
+                System.out.println("!!! InputResult is null");
             }
         }
+        return testCaseDataList;
     }
 
     /**
@@ -767,6 +728,7 @@ public class BlancoRestAutotestXmlParser {
 
     private void readInputResultValue(
             final String requestId,
+            final String responseId,
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final Map<String, String> argPropertyMap,
             final Map<String, Integer> argPropertySizeMap,
@@ -791,8 +753,14 @@ public class BlancoRestAutotestXmlParser {
             }
             System.out.println("No: " + fieldStructure.getNo() + ", caseId = " + fieldStructure.getCaseId() + ", caseLineSize = " + caseLineSize);
 
+            BlancoRestAutotestTestCaseData testCaseData = new BlancoRestAutotestTestCaseData();
+            argTestCaseDataList.add(testCaseData);
+            testCaseData.setCaseId(fieldStructure.getCaseId());
+            testCaseData.setInputId(requestId);
+            testCaseData.setExpectId(responseId);
+
             /* 入力定義読込 */
-            BlancoRestAutotestTestCaseData caseDataInput = this.createTestCaseData(
+            ApiTelegram inputTelegram = this.createTelegram(
                     requestId,
                     argFieldStructureList,
                     index,
@@ -802,16 +770,31 @@ public class BlancoRestAutotestXmlParser {
                     BlancoRestAutotestUtil.inputColumnMax,
                     argPropertySizeMap
             );
-            if (caseDataInput != null) {
-
+            if (inputTelegram == null) {
+                throw new IllegalArgumentException("!!! Can not read Input data !!! for " + fieldStructure.getCaseId());
             }
-            System.out.println("CASE: " + index);
+            testCaseData.setInput(inputTelegram);
 
+            /* 出力定義読込 */
+            ApiTelegram expectTelegram = this.createTelegram(
+                    responseId,
+                    argFieldStructureList,
+                    index,
+                    index + caseLineSize,
+                    argPropertyMap,
+                    "Expect",
+                    BlancoRestAutotestUtil.expectedColumnMax,
+                    argPropertySizeMap
+            );
+            if (expectTelegram == null) {
+                throw new IllegalArgumentException("!!! Can not read Expect data !!! for " + fieldStructure.getCaseId());
+            }
+            testCaseData.setExpect(expectTelegram);
         }
     }
 
-    public BlancoRestAutotestTestCaseData createTestCaseData(
-            final String requestId,
+    public ApiTelegram createTelegram(
+            final String telegramId,
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final int caseStartIndex,
             final int caselineMax,
@@ -820,13 +803,10 @@ public class BlancoRestAutotestXmlParser {
             final int argPropertyMax,
             final Map<String ,Integer> argPropertySizeMap
     ) throws NoSuchMethodException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        ApiTelegram telegram = BlancoRestAutotestUtil.createTelegramById(requestId);
+        ApiTelegram telegram = BlancoRestAutotestUtil.createTelegramById(telegramId);
         if (telegram == null) {
-            throw new IllegalArgumentException("Cannot create telegram for " + requestId);
+            throw new IllegalArgumentException("Cannot create telegram for " + telegramId);
         }
-        BlancoRestAutotestTestCaseData testCaseData = new BlancoRestAutotestTestCaseData();
-        testCaseData.setName(requestId);
-        testCaseData.setTelegram(telegram);
 
         int propSize = 1;
         int readLine = 0;
@@ -855,8 +835,7 @@ public class BlancoRestAutotestXmlParser {
                 propSize = argPropertySizeMap.get(nextPropKey);
             }
         }
-        testCaseData.setCaseLineNum(readLine);
-        return testCaseData;
+        return telegram;
     }
 
     /**

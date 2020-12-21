@@ -14,7 +14,7 @@ public class TableSampleOption3 {
     /**
      * フィールド: [bar]。
      */
-    private ArrayList<Long> fBar;
+    private ArrayList<String> fBar;
 
     /**
      * フィールド [foo] の値を設定します。
@@ -39,7 +39,7 @@ public class TableSampleOption3 {
      *
      * @param argBar フィールド[bar]に設定する値。
      */
-    public void setBar(final ArrayList<Long> argBar) {
+    public void setBar(final ArrayList<String> argBar) {
         fBar = argBar;
     }
 
@@ -48,7 +48,7 @@ public class TableSampleOption3 {
      *
      * @return フィールド[bar]から取得した値。
      */
-    public ArrayList<Long> getBar() {
+    public ArrayList<String> getBar() {
         return fBar;
     }
 
@@ -75,6 +75,6 @@ public class TableSampleOption3 {
         // フィールド[fFoo]はサポート外の型[java.util.ArrayListjava.lang.String]です。
         // Name: fBar
         // Type: java.util.ArrayList
-        // フィールド[fBar]はサポート外の型[java.util.ArrayListjava.lang.Long]です。
+        // フィールド[fBar]はサポート外の型[java.util.ArrayListjava.lang.String]です。
     }
 }
