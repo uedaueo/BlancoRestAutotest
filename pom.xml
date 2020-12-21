@@ -378,6 +378,7 @@
 										ignoreAnnotation="true"
 										ignoreDefault="true"
 										ignoreImport="true"
+										telegramsOnly="true"
 								/>
 							</target>
 						</configuration>

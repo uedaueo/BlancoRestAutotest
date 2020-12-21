@@ -803,7 +803,7 @@ public class BlancoRestAutotestXmlParser {
                     argPropertySizeMap
             );
             if (caseDataInput != null) {
-                
+
             }
             System.out.println("CASE: " + index);
 
