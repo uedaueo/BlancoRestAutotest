@@ -21,6 +21,13 @@ public class BlancoRestAutotestTestCaseData {
     private String fInputId;
 
     /**
+     * 電文クラスの短縮名を格納します。
+     *
+     * フィールド: [simpleInputId]。
+     */
+    private String fSimpleInputId;
+
+    /**
      * テストケースの出力値を格納します。
      *
      * フィールド: [expect]。
@@ -33,6 +40,13 @@ public class BlancoRestAutotestTestCaseData {
      * フィールド: [expectId]。
      */
     private String fExpectId;
+
+    /**
+     * 電文クラスの短縮名を格納します。
+     *
+     * フィールド: [simpleExpectId]。
+     */
+    private String fSimpleExpectId;
 
     /**
      * テストケースIDを格納します。
@@ -86,6 +100,28 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
+     * フィールド [simpleInputId] の値を設定します。
+     *
+     * フィールドの説明: [電文クラスの短縮名を格納します。]。
+     *
+     * @param argSimpleInputId フィールド[simpleInputId]に設定する値。
+     */
+    public void setSimpleInputId(final String argSimpleInputId) {
+        fSimpleInputId = argSimpleInputId;
+    }
+
+    /**
+     * フィールド [simpleInputId] の値を取得します。
+     *
+     * フィールドの説明: [電文クラスの短縮名を格納します。]。
+     *
+     * @return フィールド[simpleInputId]から取得した値。
+     */
+    public String getSimpleInputId() {
+        return fSimpleInputId;
+    }
+
+    /**
      * フィールド [expect] の値を設定します。
      *
      * フィールドの説明: [テストケースの出力値を格納します。]。
@@ -130,6 +166,28 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
+     * フィールド [simpleExpectId] の値を設定します。
+     *
+     * フィールドの説明: [電文クラスの短縮名を格納します。]。
+     *
+     * @param argSimpleExpectId フィールド[simpleExpectId]に設定する値。
+     */
+    public void setSimpleExpectId(final String argSimpleExpectId) {
+        fSimpleExpectId = argSimpleExpectId;
+    }
+
+    /**
+     * フィールド [simpleExpectId] の値を取得します。
+     *
+     * フィールドの説明: [電文クラスの短縮名を格納します。]。
+     *
+     * @return フィールド[simpleExpectId]から取得した値。
+     */
+    public String getSimpleExpectId() {
+        return fSimpleExpectId;
+    }
+
+    /**
      * フィールド [caseId] の値を設定します。
      *
      * フィールドの説明: [テストケースIDを格納します。]。
@@ -168,8 +226,10 @@ public class BlancoRestAutotestTestCaseData {
         buf.append("blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData[");
         buf.append("input=" + fInput);
         buf.append(",inputId=" + fInputId);
+        buf.append(",simpleInputId=" + fSimpleInputId);
         buf.append(",expect=" + fExpect);
         buf.append(",expectId=" + fExpectId);
+        buf.append(",simpleExpectId=" + fSimpleExpectId);
         buf.append(",caseId=" + fCaseId);
         buf.append("]");
         return buf.toString();
@@ -199,12 +259,18 @@ public class BlancoRestAutotestTestCaseData {
         // Name: fInputId
         // Type: java.lang.String
         target.fInputId = this.fInputId;
+        // Name: fSimpleInputId
+        // Type: java.lang.String
+        target.fSimpleInputId = this.fSimpleInputId;
         // Name: fExpect
         // Type: blanco.restgenerator.valueobject.ApiTelegram
         // フィールド[fExpect]はサポート外の型[blanco.restgenerator.valueobject.ApiTelegram]です。
         // Name: fExpectId
         // Type: java.lang.String
         target.fExpectId = this.fExpectId;
+        // Name: fSimpleExpectId
+        // Type: java.lang.String
+        target.fSimpleExpectId = this.fSimpleExpectId;
         // Name: fCaseId
         // Type: java.lang.String
         target.fCaseId = this.fCaseId;

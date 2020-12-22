@@ -2,6 +2,7 @@ package blanco.restautotest;
 
 import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoStringUtil;
+import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 import blanco.restgenerator.valueobject.ApiTelegram;
 import blanco.restautotest.constants.BlancoRestAutotestConstants;
 import blanco.restautotest.valueobject.BlancoRestAutotestInputResultClassStructure;
@@ -36,7 +37,8 @@ public class BlancoRestAutotestUtil {
     /**
      * 今回のテストケース生成の対象となった、全てのテストケースクラスを保持します。
      */
-    public static List<BlancoRestAutotestTestCaseClassStructure> testCases = new ArrayList<>();
+//    public static List<BlancoRestAutotestTestCaseClassStructure> testCases = new ArrayList<>();
+    public static List<BlancoRestAutotestTestCaseData> testCaseDataList = new ArrayList<>();
 
     /**
      * 今回のテストケース生成の対象となった、全ての入力値期待値クラスを保持します。
@@ -397,5 +399,46 @@ public class BlancoRestAutotestUtil {
     public static Object createGenericFromProperty(Object parentObj, String property) throws NoSuchFieldException {
         Field field = getFieldFromBlancoValueObject(parentObj, property);
         return createSimpleGenericFromField(field);
+    }
+
+
+    /**
+     * Make canonical classname into Simple.
+     *
+     * @param argClassNameCanon
+     * @return simpleName
+     */
+    static public String getSimpleClassName(final String argClassNameCanon) {
+        if (argClassNameCanon == null) {
+            return "";
+        }
+
+        String simpleName = "";
+        final int findLastDot = argClassNameCanon.lastIndexOf('.');
+        if (findLastDot == -1) {
+            simpleName = argClassNameCanon;
+        } else if (findLastDot != argClassNameCanon.length() - 1) {
+            simpleName = argClassNameCanon.substring(findLastDot + 1);
+        }
+        return simpleName;
+    }
+
+    /**
+     * Make canonical classname into packageName
+     *
+     * @param argClassNameCanon
+     * @return
+     */
+    static public String getPackageName(final String argClassNameCanon) {
+        if (argClassNameCanon == null) {
+            return "";
+        }
+
+        String simpleName = "";
+        final int findLastDot = argClassNameCanon.lastIndexOf('.');
+        if (findLastDot > 0) {
+            simpleName = argClassNameCanon.substring(0, findLastDot);
+        }
+        return simpleName;
     }
 }

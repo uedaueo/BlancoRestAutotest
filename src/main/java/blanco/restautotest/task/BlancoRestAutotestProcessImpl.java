@@ -130,6 +130,7 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
                     allTestCaseDataList.addAll(testCaseDataList);
                 }
             }
+            BlancoRestAutotestUtil.testCaseDataList = allTestCaseDataList;
 
             /*
              * TODO

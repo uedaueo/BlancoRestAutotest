@@ -388,6 +388,30 @@
 					</execution>
 
 					<execution>
+						<id>blanco-meta-restautotest-test</id>
+						<phase>generate-test-sources</phase>
+						<configuration>
+							<target>
+								<taskdef name="blancorestautotest" classname="blanco.restautotest.task.BlancoRestAutotestTask" classpathref="maven.runtime.classpath">
+								</taskdef>
+								<blancorestautotest
+									metadir="meta/test"
+									encoding="UTF-8"
+									sheetType="php"
+									tmpdir="tmpTest"
+									targetdir="sample/blanco"
+									targetStyle="maven"
+									verbose="true"
+									lineSeparator="LF"
+								/>
+							</target>
+						</configuration>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+
+					<execution>
 						<id>blanco-clean</id>
 						<phase>clean</phase>
 						<configuration>
@@ -436,9 +460,9 @@
 				<configuration>
 					<source>${maven.compiler.source}</source>
 					<target>${maven.compiler.target}</target>
-					<excludes>
-						<exclude>blanco/sample/**/*</exclude>
-					</excludes>
+<!--					<excludes>-->
+<!--						<exclude>blanco/sample/**/*</exclude>-->
+<!--					</excludes>-->
 				</configuration>
 			</plugin>
 

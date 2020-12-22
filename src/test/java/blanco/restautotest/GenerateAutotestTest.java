@@ -22,6 +22,7 @@ public class GenerateAutotestTest {
         BlancoRestAutotestProcessImpl imple = new BlancoRestAutotestProcessImpl();
         try {
             imple.execute(input);
+            System.out.println("testCaseDataList = " + BlancoRestAutotestUtil.testCaseDataList);
         } catch (IOException e) {
             e.printStackTrace();
         }

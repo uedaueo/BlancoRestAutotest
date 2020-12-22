@@ -60,43 +60,8 @@ public class BlancoRestAutotestXmlParser {
          * TestCaseのパースにはAPIヘッダの解析が必須であり、それは アプリケーション毎に
          * 違う可能性があるからです。
          */
-//        parseTestCase(elementRoot);
         //  次に、全ての InputResult を parse します。
         return parseInputResult(elementRoot);
-    }
-
-    /**
-     * 中間XMLファイル形式のXMLドキュメントをパースして、TestCase情報を取得します。
-     *
-     * @param argElementRoot
-     *            中間XMLファイルのXMLドキュメント。
-     */
-    public void parseTestCase(
-            final BlancoXmlElement argElementRoot) {
-
-        // sheet(Excelシート)のリストを取得します。
-        final List<BlancoXmlElement> listSheet = BlancoXmlBindingUtil
-                .getElementsByTagName(argElementRoot, "sheet");
-
-        final int sizeListSheet = listSheet.size();
-        for (int index = 0; index < sizeListSheet; index++) {
-            final BlancoXmlElement elementSheet = listSheet.get(index);
-
-            if (elementSheet != null) {
-//                System.out.println("Parse TestCase Sheet: " + elementSheet.getAtts().get(0).getValue());
-            } else {
-                System.out.println("!!! Parse TestCase elementSheet is null!");
-            }
-
-            // テストケース一覧の作成
-            BlancoRestAutotestTestCaseClassStructure objClassStructure = parseTestCaseElementSheet(elementSheet);
-            if (objClassStructure != null) {
-                System.out.println("TestCase class: " + objClassStructure.getName());                // 得られた情報を記憶します。
-                BlancoRestAutotestUtil.testCases.add(objClassStructure);
-            } else {
-//                System.out.println("!!! TestCase is null!");
-            }
-        }
     }
 
     /**
@@ -757,7 +722,9 @@ public class BlancoRestAutotestXmlParser {
             argTestCaseDataList.add(testCaseData);
             testCaseData.setCaseId(fieldStructure.getCaseId());
             testCaseData.setInputId(requestId);
+            testCaseData.setSimpleInputId(BlancoRestAutotestUtil.getSimpleClassName(requestId));
             testCaseData.setExpectId(responseId);
+            testCaseData.setSimpleExpectId(BlancoRestAutotestUtil.getSimpleClassName(responseId));
 
             /* 入力定義読込 */
             ApiTelegram inputTelegram = this.createTelegram(
