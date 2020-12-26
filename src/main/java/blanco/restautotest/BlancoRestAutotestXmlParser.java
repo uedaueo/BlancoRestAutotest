@@ -93,16 +93,7 @@ public class BlancoRestAutotestXmlParser {
             if (inputResultClassStructure != null) {
                 System.out.println("InputResult class: " + inputResultClassStructure.getName());
 
-                /*
-                 * Input?/Expected? ごとに入っているはずのプロパティリストを
-                 * property.property.property という書式で保持する
-                 */
-                Map<String, String> propertyMap = new HashMap<>();
-                /*
-                 * property.property... という形式で、そのプロパティの横幅（定義書のカラム数）を保持する。
-                 */
-                Map<String, Integer> propertySizeMap = new HashMap<>();
-                this.analyzeInputResultClass(inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap);
+                this.analyzeInputResultClass(inputResultClassStructure.getInputResultFieldList(), BlancoRestAutotestUtil.propertyMap, BlancoRestAutotestUtil.propertySizeMap);
 //                Set<String> keySet = propertyMap.keySet();
 //                for (String key : keySet) {
 //                    System.out.println(key + ":" + propertyMap.get(key));
@@ -114,7 +105,7 @@ public class BlancoRestAutotestXmlParser {
                 String requestId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Request";
                 String responseId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Response";
 
-                this.readInputResultValue(requestId, responseId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
+                this.readInputResultValue(requestId, responseId, inputResultClassStructure.getInputResultFieldList(), BlancoRestAutotestUtil.propertyMap, BlancoRestAutotestUtil.propertySizeMap, testCaseDataList);
 
             } else {
                 System.out.println("!!! InputResult is null");
