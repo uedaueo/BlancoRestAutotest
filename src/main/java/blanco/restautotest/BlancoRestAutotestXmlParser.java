@@ -93,11 +93,18 @@ public class BlancoRestAutotestXmlParser {
             if (inputResultClassStructure != null) {
                 System.out.println("InputResult class: " + inputResultClassStructure.getName());
 
-                this.analyzeInputResultClass(inputResultClassStructure.getInputResultFieldList(), BlancoRestAutotestUtil.propertyMap, BlancoRestAutotestUtil.propertySizeMap);
-//                Set<String> keySet = propertyMap.keySet();
-//                for (String key : keySet) {
-//                    System.out.println(key + ":" + propertyMap.get(key));
-//                }
+                /*
+                 * Input?/Expected? ごとに入っているはずのプロパティリストを
+                 * property.property.property という書式で保持する
+                 * この変数はシート毎にクリアされる必要がある。
+                 */
+                Map<String, String> propertyMap = new HashMap<>();
+                /*
+                 * property.property... という形式で、そのプロパティの横幅（定義書のカラム数）を保持する。
+                 * この変数はシート毎にクリアされる必要がある。
+                 */
+                Map<String, Integer> propertySizeMap = new HashMap<>();
+                this.analyzeInputResultClass(inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap);
 
                 /*
                  * テストケースの入出力値を読み取る
@@ -105,7 +112,7 @@ public class BlancoRestAutotestXmlParser {
                 String requestId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Request";
                 String responseId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Response";
 
-                this.readInputResultValue(requestId, responseId, inputResultClassStructure.getInputResultFieldList(), BlancoRestAutotestUtil.propertyMap, BlancoRestAutotestUtil.propertySizeMap, testCaseDataList);
+                this.readInputResultValue(requestId, responseId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
 
             } else {
                 System.out.println("!!! InputResult is null");
@@ -693,11 +700,14 @@ public class BlancoRestAutotestXmlParser {
         int startLine = Math.max(BlancoRestAutotestUtil.inputNestDepth, BlancoRestAutotestUtil.expectedNestDepth);
 
         int caseLineSize = Integer.MAX_VALUE;
+        List<String> assertKindList = null;
         for (int index = startLine; index < argFieldStructureList.size() && caseLineSize > 0; index += caseLineSize) {
             System.out.println("INDEX: " + index);
             BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(index);
             if (fieldStructure.getKind().equals(BlancoRestAutotestConstants.INPUT_RESULT_KIND_ASSERT)) {
-                /* 比較方法行は読み飛ばす */
+                /* 比較方法行は読み込んで次へ */
+                assertKindList = this.getAssertKindList(fieldStructure);
+                System.out.println("!!! GET Assert Kind List !!!");
                 caseLineSize = 1;
                 continue;
             }
@@ -748,7 +758,32 @@ public class BlancoRestAutotestXmlParser {
                 throw new IllegalArgumentException("!!! Can not read Expect data !!! for " + fieldStructure.getCaseId());
             }
             testCaseData.setExpect(expectTelegram);
+
+            testCaseData.setInputColumnMax(BlancoRestAutotestUtil.inputColumnMax);
+            testCaseData.setExpectedColumnMax(BlancoRestAutotestUtil.expectedColumnMax);
+            testCaseData.setPropertyMap(argPropertyMap);
+            testCaseData.setPropertySizeMap(argPropertySizeMap);
+            testCaseData.setAssertKindList(assertKindList);
+            assertKindList = null;
         }
+    }
+
+    private List<String> getAssertKindList(
+            final BlancoRestAutotestInputResultFieldStructure argFieldStructure
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        if (!argFieldStructure.getKind().equals(BlancoRestAutotestConstants.INPUT_RESULT_KIND_ASSERT)) {
+            return null;
+        }
+        List<String> assertKindList = new ArrayList<>();
+        for (int index = 0; index < BlancoRestAutotestUtil.expectedColumnMax; index++) {
+            String kind = BlancoRestAutotestUtil.getStringValue(argFieldStructure, "Expect" + (index + 1));
+            if (kind != null) {
+                assertKindList.add(kind);
+            } else {
+                throw new IllegalArgumentException(fMsg.getMbvoji07("比較方法", "kind"));
+            }
+        }
+        return assertKindList;
     }
 
     public ApiTelegram createTelegram(

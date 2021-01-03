@@ -1,5 +1,8 @@
 package blanco.restautotest.valueobject;
 
+import java.util.List;
+import java.util.Map;
+
 import blanco.restgenerator.valueobject.ApiTelegram;
 
 /**
@@ -54,6 +57,43 @@ public class BlancoRestAutotestTestCaseData {
      * フィールド: [caseId]。
      */
     private String fCaseId;
+
+    /**
+     * このテストケースのInputカラムの最大値を保持します。
+     *
+     * フィールド: [inputColumnMax]。
+     * デフォルト: [0]。
+     */
+    private Integer fInputColumnMax = 0;
+
+    /**
+     * このテストケースのExpectカラムの最大値を保持します。
+     *
+     * フィールド: [expectedColumnMax]。
+     * デフォルト: [0]。
+     */
+    private Integer fExpectedColumnMax = 0;
+
+    /**
+     * Input?/Expected? ごとに入っているはずのプロパティリストを保持する
+     *
+     * フィールド: [propertyMap]。
+     */
+    private Map<String, String> fPropertyMap;
+
+    /**
+     * property.property... という形式で、そのプロパティの横幅（定義書のカラム数）を保持する。
+     *
+     * フィールド: [propertySizeMap]。
+     */
+    private Map<String, Integer> fPropertySizeMap;
+
+    /**
+     * Expect? のカラムごとの比較方法を保持します。
+     *
+     * フィールド: [assertKindList]。
+     */
+    private List<String> fAssertKindList;
 
     /**
      * フィールド [input] の値を設定します。
@@ -210,6 +250,118 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
+     * フィールド [inputColumnMax] の値を設定します。
+     *
+     * フィールドの説明: [このテストケースのInputカラムの最大値を保持します。]。
+     *
+     * @param argInputColumnMax フィールド[inputColumnMax]に設定する値。
+     */
+    public void setInputColumnMax(final Integer argInputColumnMax) {
+        fInputColumnMax = argInputColumnMax;
+    }
+
+    /**
+     * フィールド [inputColumnMax] の値を取得します。
+     *
+     * フィールドの説明: [このテストケースのInputカラムの最大値を保持します。]。
+     * デフォルト: [0]。
+     *
+     * @return フィールド[inputColumnMax]から取得した値。
+     */
+    public Integer getInputColumnMax() {
+        return fInputColumnMax;
+    }
+
+    /**
+     * フィールド [expectedColumnMax] の値を設定します。
+     *
+     * フィールドの説明: [このテストケースのExpectカラムの最大値を保持します。]。
+     *
+     * @param argExpectedColumnMax フィールド[expectedColumnMax]に設定する値。
+     */
+    public void setExpectedColumnMax(final Integer argExpectedColumnMax) {
+        fExpectedColumnMax = argExpectedColumnMax;
+    }
+
+    /**
+     * フィールド [expectedColumnMax] の値を取得します。
+     *
+     * フィールドの説明: [このテストケースのExpectカラムの最大値を保持します。]。
+     * デフォルト: [0]。
+     *
+     * @return フィールド[expectedColumnMax]から取得した値。
+     */
+    public Integer getExpectedColumnMax() {
+        return fExpectedColumnMax;
+    }
+
+    /**
+     * フィールド [propertyMap] の値を設定します。
+     *
+     * フィールドの説明: [Input?/Expected? ごとに入っているはずのプロパティリストを保持する]。
+     *
+     * @param argPropertyMap フィールド[propertyMap]に設定する値。
+     */
+    public void setPropertyMap(final Map<String, String> argPropertyMap) {
+        fPropertyMap = argPropertyMap;
+    }
+
+    /**
+     * フィールド [propertyMap] の値を取得します。
+     *
+     * フィールドの説明: [Input?/Expected? ごとに入っているはずのプロパティリストを保持する]。
+     *
+     * @return フィールド[propertyMap]から取得した値。
+     */
+    public Map<String, String> getPropertyMap() {
+        return fPropertyMap;
+    }
+
+    /**
+     * フィールド [propertySizeMap] の値を設定します。
+     *
+     * フィールドの説明: [property.property... という形式で、そのプロパティの横幅（定義書のカラム数）を保持する。]。
+     *
+     * @param argPropertySizeMap フィールド[propertySizeMap]に設定する値。
+     */
+    public void setPropertySizeMap(final Map<String, Integer> argPropertySizeMap) {
+        fPropertySizeMap = argPropertySizeMap;
+    }
+
+    /**
+     * フィールド [propertySizeMap] の値を取得します。
+     *
+     * フィールドの説明: [property.property... という形式で、そのプロパティの横幅（定義書のカラム数）を保持する。]。
+     *
+     * @return フィールド[propertySizeMap]から取得した値。
+     */
+    public Map<String, Integer> getPropertySizeMap() {
+        return fPropertySizeMap;
+    }
+
+    /**
+     * フィールド [assertKindList] の値を設定します。
+     *
+     * フィールドの説明: [Expect? のカラムごとの比較方法を保持します。]。
+     *
+     * @param argAssertKindList フィールド[assertKindList]に設定する値。
+     */
+    public void setAssertKindList(final List<String> argAssertKindList) {
+        fAssertKindList = argAssertKindList;
+    }
+
+    /**
+     * フィールド [assertKindList] の値を取得します。
+     *
+     * フィールドの説明: [Expect? のカラムごとの比較方法を保持します。]。
+     *
+     * @return フィールド[assertKindList]から取得した値。
+     */
+    public List<String> getAssertKindList() {
+        return fAssertKindList;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -231,6 +383,11 @@ public class BlancoRestAutotestTestCaseData {
         buf.append(",expectId=" + fExpectId);
         buf.append(",simpleExpectId=" + fSimpleExpectId);
         buf.append(",caseId=" + fCaseId);
+        buf.append(",inputColumnMax=" + fInputColumnMax);
+        buf.append(",expectedColumnMax=" + fExpectedColumnMax);
+        buf.append(",propertyMap=" + fPropertyMap);
+        buf.append(",propertySizeMap=" + fPropertySizeMap);
+        buf.append(",assertKindList=" + fAssertKindList);
         buf.append("]");
         return buf.toString();
     }
@@ -274,5 +431,20 @@ public class BlancoRestAutotestTestCaseData {
         // Name: fCaseId
         // Type: java.lang.String
         target.fCaseId = this.fCaseId;
+        // Name: fInputColumnMax
+        // Type: java.lang.Integer
+        target.fInputColumnMax = this.fInputColumnMax;
+        // Name: fExpectedColumnMax
+        // Type: java.lang.Integer
+        target.fExpectedColumnMax = this.fExpectedColumnMax;
+        // Name: fPropertyMap
+        // Type: java.util.Map
+        // フィールド[fPropertyMap]はサポート外の型[java.util.MapString, String]です。
+        // Name: fPropertySizeMap
+        // Type: java.util.Map
+        // フィールド[fPropertySizeMap]はサポート外の型[java.util.MapString, Integer]です。
+        // Name: fAssertKindList
+        // Type: java.util.List
+        // フィールド[fAssertKindList]はサポート外の型[java.util.ListString]です。
     }
 }

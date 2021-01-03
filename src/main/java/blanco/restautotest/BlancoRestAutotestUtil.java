@@ -37,15 +37,6 @@ public class BlancoRestAutotestUtil {
      * 今回のテストケース生成の対象となった、全てのテストケースクラスを保持します。
      */
     public static List<BlancoRestAutotestTestCaseData> testCaseDataList = new ArrayList<>();
-    /*
-     * Input?/Expected? ごとに入っているはずのプロパティリストを
-     * property.property.property という書式で保持する
-     */
-    public static Map<String, String> propertyMap = new HashMap<>();
-    /*
-     * property.property... という形式で、そのプロパティの横幅（定義書のカラム数）を保持する。
-     */
-    public static Map<String, Integer> propertySizeMap = new HashMap<>();
 
     /**
      * 今回のテストケース生成の対象となった、全ての入力値期待値クラスを保持します。
