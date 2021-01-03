@@ -112,7 +112,7 @@ public class BlancoRestAutotestXmlParser {
                 String requestId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Request";
                 String responseId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Response";
 
-                this.readInputResultValue(requestId, responseId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
+                this.readInputResultValue(inputResultClassStructure.getName(), requestId, responseId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
 
             } else {
                 System.out.println("!!! InputResult is null");
@@ -690,6 +690,7 @@ public class BlancoRestAutotestXmlParser {
     }
 
     private void readInputResultValue(
+            final String apiSimpleId,
             final String requestId,
             final String responseId,
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
@@ -759,11 +760,13 @@ public class BlancoRestAutotestXmlParser {
             }
             testCaseData.setExpect(expectTelegram);
 
+            testCaseData.setTargetApiSimpleId(apiSimpleId);
             testCaseData.setInputColumnMax(BlancoRestAutotestUtil.inputColumnMax);
             testCaseData.setExpectedColumnMax(BlancoRestAutotestUtil.expectedColumnMax);
             testCaseData.setPropertyMap(argPropertyMap);
             testCaseData.setPropertySizeMap(argPropertySizeMap);
             testCaseData.setAssertKindList(assertKindList);
+            System.out.println("testCaseData = " + testCaseData);
             assertKindList = null;
         }
     }

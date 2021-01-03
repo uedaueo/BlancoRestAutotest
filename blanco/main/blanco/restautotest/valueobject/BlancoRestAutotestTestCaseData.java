@@ -96,6 +96,13 @@ public class BlancoRestAutotestTestCaseData {
     private List<String> fAssertKindList;
 
     /**
+     * 対象APIの電文処理IDの短縮名を格納します。
+     *
+     * フィールド: [targetApiSimpleId]。
+     */
+    private String fTargetApiSimpleId;
+
+    /**
      * フィールド [input] の値を設定します。
      *
      * フィールドの説明: [テストケースの入力値を格納します。]。
@@ -362,6 +369,28 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
+     * フィールド [targetApiSimpleId] の値を設定します。
+     *
+     * フィールドの説明: [対象APIの電文処理IDの短縮名を格納します。]。
+     *
+     * @param argTargetApiSimpleId フィールド[targetApiSimpleId]に設定する値。
+     */
+    public void setTargetApiSimpleId(final String argTargetApiSimpleId) {
+        fTargetApiSimpleId = argTargetApiSimpleId;
+    }
+
+    /**
+     * フィールド [targetApiSimpleId] の値を取得します。
+     *
+     * フィールドの説明: [対象APIの電文処理IDの短縮名を格納します。]。
+     *
+     * @return フィールド[targetApiSimpleId]から取得した値。
+     */
+    public String getTargetApiSimpleId() {
+        return fTargetApiSimpleId;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -388,6 +417,7 @@ public class BlancoRestAutotestTestCaseData {
         buf.append(",propertyMap=" + fPropertyMap);
         buf.append(",propertySizeMap=" + fPropertySizeMap);
         buf.append(",assertKindList=" + fAssertKindList);
+        buf.append(",targetApiSimpleId=" + fTargetApiSimpleId);
         buf.append("]");
         return buf.toString();
     }
@@ -446,5 +476,8 @@ public class BlancoRestAutotestTestCaseData {
         // Name: fAssertKindList
         // Type: java.util.List
         // フィールド[fAssertKindList]はサポート外の型[java.util.ListString]です。
+        // Name: fTargetApiSimpleId
+        // Type: java.lang.String
+        target.fTargetApiSimpleId = this.fTargetApiSimpleId;
     }
 }
