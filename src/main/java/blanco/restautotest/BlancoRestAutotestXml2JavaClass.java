@@ -20,10 +20,11 @@ import blanco.restautotest.valueobject.BlancoRestAutotestInputResultFieldStructu
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseFieldStructure;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.util.DefaultIndenter;
+import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,7 +33,7 @@ import java.util.List;
 
 /**
  * バリューオブジェクト用中間XMLファイルから Javaソースコードを自動生成するクラス。
- *
+ * <p>
  * blancoValueObjectの主たるクラスのひとつです。
  *
  * @author IGA Tosiki
@@ -84,17 +85,21 @@ public class BlancoRestAutotestXml2JavaClass {
      * ソースコード生成先ディレクトリのスタイル
      */
     private boolean fTargetStyleAdvanced = false;
+
     public void setTargetStyleAdvanced(boolean argTargetStyleAdvanced) {
         this.fTargetStyleAdvanced = argTargetStyleAdvanced;
     }
+
     public boolean isTargetStyleAdvanced() {
         return this.fTargetStyleAdvanced;
     }
 
     private boolean fVerbose = false;
+
     public void setVerbose(boolean argVerbose) {
         this.fVerbose = argVerbose;
     }
+
     public boolean isVerbose() {
         return this.fVerbose;
     }
@@ -104,10 +109,8 @@ public class BlancoRestAutotestXml2JavaClass {
     /**
      * バリューオブジェクトを表現する中間XMLファイルから、Javaソースコードを自動生成します。
      *
-     * @param argDirectoryTarget
-     *            ソースコード生成先ディレクトリ
-     * @throws IOException
-     *             入出力例外が発生した場合
+     * @param argDirectoryTarget ソースコード生成先ディレクトリ
+     * @throws IOException 入出力例外が発生した場合
      */
     public void process(
             final File argDirectoryTarget, final List<BlancoRestAutotestTestCaseData> argAllTestCaseData) throws IOException {
@@ -125,11 +128,37 @@ public class BlancoRestAutotestXml2JavaClass {
 
         /* tueda DEBUG */
         System.out.println("testCaseData2Json : " + fileBlancoMain.getAbsolutePath());
+        System.out.println("targetFilePath: " + argDirectoryTarget.getAbsolutePath());
 
         for (BlancoRestAutotestTestCaseData testCaseData : argAllTestCaseData) {
             ObjectMapper mapper = new ObjectMapper();
-            String requestJson = mapper.writeValueAsString(testCaseData.getInput());
+            DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
+            printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
+            String requestJson = mapper.writer(printer).writeValueAsString(testCaseData.getInput());
+            String responseJson = mapper.writer(printer).writeValueAsString(testCaseData.getExpect());
+            String requestFileName = testCaseData.getSimpleInputId() + "-" + testCaseData.getCaseId() + ".json";
+            String responseFileName = testCaseData.getSimpleExpectId() + "-" + testCaseData.getCaseId() + ".json";
+            makeJsonFiles(requestFileName, argDirectoryTarget, requestJson);
+            makeJsonFiles(responseFileName, argDirectoryTarget, responseJson);
             System.out.println("JSON: " + requestJson);
+            System.out.println("JSON: " + responseJson);
+        }
+    }
+
+    public void makeJsonFiles(String fileName, File argDirectoryTarget, String jsonData) {
+        File file = new File(argDirectoryTarget.getAbsolutePath());
+        if (!file.exists()) {
+            file.mkdirs();
+            System.out.println("新規ディレクトリを作成しました。 FilePath : " + file.getAbsolutePath());
+        }
+        try {
+            FileWriter fileWriter = new FileWriter(argDirectoryTarget.getAbsolutePath() + "/" + fileName);
+            PrintWriter printWriter = new PrintWriter(new BufferedWriter(fileWriter));
+            printWriter.print(jsonData);
+            printWriter.close();
+            fileWriter.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
