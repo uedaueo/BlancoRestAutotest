@@ -147,6 +147,8 @@ public class BlancoRestAutotestUtil {
             valueObj = Float.parseFloat(value);
         } else if ("java.lang.Double".equals(typeId)) {
             valueObj = Double.parseDouble(value);
+        } else if ("java.lang.Boolean".equals(typeId)) {
+            valueObj = Boolean.parseBoolean(value);
         } else if ("java.lang.String".equals(typeId)) {
             valueObj = value;
         } else {
