@@ -824,7 +824,8 @@ public class BlancoRestAutotestXmlParser {
                         index + 1,
                         argPropertyMap,
                         argPropertySizeMap,
-                        false);
+                        false,
+                        "");
                 readLine = Math.max(readLine, readLine0);
                 /* 次のプロパティで処理されたであろう幅を取得する */
                 String nextPropKey = propTree[0];
@@ -865,7 +866,9 @@ public class BlancoRestAutotestXmlParser {
             final int argColumnNumber,
             final Map<String, String> argPropertyMap,
             final Map<String, Integer> argPropertySizeMap,
-            final boolean argNotSearchProp) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+            final boolean argNotSearchProp,
+            final String indent
+    ) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
         if (argParentObj == null ||
                 argPropertyList == null ||
                 argFieldStructureList == null ||
@@ -887,7 +890,7 @@ public class BlancoRestAutotestXmlParser {
         String columnId = argColumnTag + argColumnNumber;
         String propId = argPropertyList[argPropertyDepth];
 
-        System.out.println("START readProperty : parentObj = " + argParentObj.getClass().getName() + ", columnId = " + columnId + ", propId = " + propId + ", caseLineStart = " + argCaseLineStart + ", argNotSearchProp = " + argNotSearchProp);
+        System.out.println(indent + "START readProperty : parentObj = " + argParentObj.getClass().getName() + ", columnId = " + columnId + ", propId = " + propId + ", caseLineStart = " + argCaseLineStart + ", argNotSearchProp = " + argNotSearchProp);
 
         Object propObj = argParentObj;
         if (!argNotSearchProp && !BlancoRestAutotestUtil.isPrimitiveObject(argParentObj)) {
@@ -897,7 +900,7 @@ public class BlancoRestAutotestXmlParser {
             }
         }
 
-        System.out.println("      readProperty : propObj = " + propObj.getClass().getName());
+        System.out.println(indent + "      readProperty : propObj = " + propObj.getClass().getName());
 
         /*
          * まずオブジェクトの種別を判定する
@@ -909,7 +912,7 @@ public class BlancoRestAutotestXmlParser {
             BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart);
             if (fieldStructure != null) {
                 String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, columnId);
-                System.out.println("readProperty: primitive: " + value);
+                System.out.println(indent + "readProperty: primitive: " + value);
                 if (value != null) {
                     /* ここで array の terminator チェック */
                     if (value.startsWith("#")) {
@@ -928,12 +931,6 @@ public class BlancoRestAutotestXmlParser {
              * Array なので Generic を生成して次のプロパティチェックに進む。
              * なお、field 定義に Generic は明記されている前提である。
              */
-            Object genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, propId);
-            if (genericObj == null) {
-                throw new IllegalArgumentException("Array には総称型の指定が必須です。");
-            }
-            System.out.println("Generci = " + genericObj.getClass().getName());
-            boolean isPrimitiveGeneric = BlancoRestAutotestUtil.isPrimitiveObject(genericObj);
             /*
              * この array の最終行の index を取得する
              */
@@ -945,11 +942,19 @@ public class BlancoRestAutotestXmlParser {
                     argCaseLineMax
             );
 
-            System.out.println("arrayEndIndex = " + arrayEndIndex);
+            System.out.println(indent + "arrayEndIndex = " + arrayEndIndex);
 
             int readLine0 = 0;
             int arrayCount = 0;
             for (arrayCount = 0; arrayCount < arrayEndIndex + 1 - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
+                Object genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, propId);
+                if (genericObj == null) {
+                    throw new IllegalArgumentException("Array には総称型の指定が必須です。");
+                }
+                if (arrayCount == 0) {
+                    System.out.println(indent + "Generci = " + genericObj.getClass().getName());
+                }
+                boolean isPrimitiveGeneric = BlancoRestAutotestUtil.isPrimitiveObject(genericObj);
                 if (isPrimitiveGeneric) {
                     BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
                     if (fieldStructure != null) {
@@ -957,9 +962,9 @@ public class BlancoRestAutotestXmlParser {
                         if (value != null) {
                             if (!value.startsWith("#")) {
                                 BlancoRestAutotestUtil.addToList(propObj, value);
-                                System.out.println("readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
+                                System.out.println(indent + "readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
                             } else {
-                                System.out.println("readProperty array: primitive: " + value + " is ignored");
+                                System.out.println(indent + "readProperty array: primitive: " + value + " is ignored");
                             }
                             readLine0 = 1;
                             readLine++;
@@ -979,10 +984,11 @@ public class BlancoRestAutotestXmlParser {
                             argColumnNumber,
                             argPropertyMap,
                             argPropertySizeMap,
-                            true);
+                            true,
+                            indent + "  ");
                     if (readLine0 > 0) {
                         BlancoRestAutotestUtil.addToList(propObj, genericObj);
-                        System.out.println("readProperty array: " + genericObj.getClass().getName() + " is pushed to " + propObj.getClass().getName());
+                        System.out.println(indent + "readProperty array: " + genericObj.getClass().getName() + " is pushed to " + propObj.getClass().getName());
                         readLine += readLine0;
                     } else {
                         break;
@@ -991,7 +997,7 @@ public class BlancoRestAutotestXmlParser {
             }
 //            readLine += 1; /* 配列のターミネータ分 */
             BlancoRestAutotestUtil.setValue(argParentObj, propId, propObj);
-            System.out.println("readProperty array: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName() + " on " + propId);
+            System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName() + " on " + propId);
         } else {
             // Primitive でも Array でも無ければその他オブジェクトなので、次のプロパティチェックに進む
             /* このプロパティの幅を取得する */
@@ -1003,11 +1009,11 @@ public class BlancoRestAutotestXmlParser {
             boolean hasValue = false;
             int propSize = 0;
             int propertyMax = argPropertySizeMap.get(propKey);
-            System.out.println("### readProperty object: propKey = " + propKey + ", propMax = " + propertyMax + ", propObj = " + propObj.getClass().getName());
+            System.out.println(indent + "### readProperty object: propKey = " + propKey + ", propMax = " + propertyMax + ", propObj = " + propObj.getClass().getName());
             for (int index = argColumnNumber; index < argColumnNumber + propertyMax; index += propSize) {
                 String columnName = argColumnTag + index;
                 String propertyList = argPropertyMap.get(columnName);
-                System.out.println("readProperty object: columnName = " + columnName + ", propertyList = " + propertyList+ " (" + index + "), depth = " + argPropertyDepth + ", propObj = " + propObj.getClass().getName());
+                System.out.println(indent + "readProperty object: columnName = " + columnName + ", propertyList = " + propertyList+ " (" + index + "), depth = " + argPropertyDepth + ", propObj = " + propObj.getClass().getName());
                 if (propertyList == null) {
                     throw new IllegalAccessException("No such column exists: " + columnName);
                 }
@@ -1024,7 +1030,8 @@ public class BlancoRestAutotestXmlParser {
                         index,
                         argPropertyMap,
                         argPropertySizeMap,
-                        false);
+                        false,
+                        indent + "  ");
                 if (readLine0 > 0) {
                     hasValue = true;
                     readLine = Math.max(readLine, readLine0);
@@ -1037,21 +1044,21 @@ public class BlancoRestAutotestXmlParser {
                         nextPropKey = nextPropKey.length() > 0 ? nextPropKey + "." + propTree[i] : propTree[i];
                     }
                     propSize = argPropertySizeMap.get(nextPropKey);
-                    System.out.println("readProperty object : propSize = " + propSize + " for " + nextPropKey);
+                    System.out.println(indent + "readProperty object : propSize = " + propSize + " for " + nextPropKey);
                 }
             }
             if (hasValue) {
                 if (!argParentObj.getClass().getName().equals(propObj.getClass().getName())) {
                     /* Array から Generic で呼び出された場合は argParentObj と propObj が同じになっている */
                     BlancoRestAutotestUtil.setValue(argParentObj, propId, propObj);
-                    System.out.println("readProperty object: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName());
+                    System.out.println(indent + "readProperty object: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName());
                 }
             } else {
                 readLine = 0;
             }
         }
 
-        System.out.println("END readProperty : readLine = " + readLine);
+        System.out.println(indent + "END readProperty : readLine = " + readLine);
         return readLine;
     }
 }
