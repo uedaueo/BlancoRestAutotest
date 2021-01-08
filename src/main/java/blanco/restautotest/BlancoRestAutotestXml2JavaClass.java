@@ -23,6 +23,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
@@ -132,6 +133,7 @@ public class BlancoRestAutotestXml2JavaClass {
 
         for (BlancoRestAutotestTestCaseData testCaseData : argAllTestCaseData) {
             ObjectMapper mapper = new ObjectMapper();
+            mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
             printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
             String requestJson = mapper.writer(printer).writeValueAsString(testCaseData.getInput());
