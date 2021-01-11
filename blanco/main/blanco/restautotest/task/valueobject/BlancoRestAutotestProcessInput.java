@@ -75,6 +75,14 @@ public class BlancoRestAutotestProcessInput {
     private String fTargetStyle = "blanco";
 
     /**
+     * 電文をJSONファイルとして出力します。
+     *
+     * フィールド: [outputJson]。
+     * デフォルト: [true]。
+     */
+    private boolean fOutputJson = true;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [verboseモードで動作させるかどうか。]。
@@ -280,6 +288,29 @@ public class BlancoRestAutotestProcessInput {
     }
 
     /**
+     * フィールド [outputJson] の値を設定します。
+     *
+     * フィールドの説明: [電文をJSONファイルとして出力します。]。
+     *
+     * @param argOutputJson フィールド[outputJson]に設定する値。
+     */
+    public void setOutputJson(final boolean argOutputJson) {
+        fOutputJson = argOutputJson;
+    }
+
+    /**
+     * フィールド [outputJson] の値を取得します。
+     *
+     * フィールドの説明: [電文をJSONファイルとして出力します。]。
+     * デフォルト: [true]。
+     *
+     * @return フィールド[outputJson]から取得した値。
+     */
+    public boolean getOutputJson() {
+        return fOutputJson;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -303,6 +334,7 @@ public class BlancoRestAutotestProcessInput {
         buf.append(",sheetType=" + fSheetType);
         buf.append(",lineSeparator=" + fLineSeparator);
         buf.append(",targetStyle=" + fTargetStyle);
+        buf.append(",outputJson=" + fOutputJson);
         buf.append("]");
         return buf.toString();
     }
@@ -352,5 +384,8 @@ public class BlancoRestAutotestProcessInput {
         // Name: fTargetStyle
         // Type: java.lang.String
         target.fTargetStyle = this.fTargetStyle;
+        // Name: fOutputJson
+        // Type: boolean
+        target.fOutputJson = this.fOutputJson;
     }
 }

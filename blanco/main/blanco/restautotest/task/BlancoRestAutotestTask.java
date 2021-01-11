@@ -69,6 +69,11 @@ public class BlancoRestAutotestTask extends Task {
     protected boolean fIsFieldTargetStyleProcessed = false;
 
     /**
+     * フィールド [outputJson] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldOutputJsonProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -294,6 +299,32 @@ public class BlancoRestAutotestTask extends Task {
     }
 
     /**
+     * Antタスクの[outputJson]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 7<br>
+     * 電文をJSONファイルとして出力します。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setOutputJson(final boolean arg) {
+        fInput.setOutputJson(arg);
+        fIsFieldOutputJsonProcessed = true;
+    }
+
+    /**
+     * Antタスクの[outputJson]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 7<br>
+     * 電文をJSONファイルとして出力します。<br>
+     * デフォルト値[true]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public boolean getOutputJson() {
+        return fInput.getOutputJson();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -317,6 +348,7 @@ public class BlancoRestAutotestTask extends Task {
             System.out.println("- sheetType:[" + getSheetType() + "]");
             System.out.println("- lineSeparator:[" + getLineSeparator() + "]");
             System.out.println("- targetStyle:[" + getTargetStyle() + "]");
+            System.out.println("- outputJson:[" + getOutputJson() + "]");
         }
 
         try {

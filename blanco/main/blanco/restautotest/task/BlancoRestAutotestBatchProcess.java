@@ -69,6 +69,8 @@ public class BlancoRestAutotestBatchProcess {
                 input.setLineSeparator(arg.substring(15));
             } else if (arg.startsWith("-targetStyle=")) {
                 input.setTargetStyle(arg.substring(13));
+            } else if (arg.startsWith("-outputJson=")) {
+                input.setOutputJson(Boolean.valueOf(arg.substring(12)).booleanValue());
             } else if (arg.equals("-?") || arg.equals("-help")) {
                 usage();
                 System.exit(END_SUCCESS);
@@ -162,7 +164,7 @@ public class BlancoRestAutotestBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestAutotestBatchProcess: Usage:");
-        System.out.println("  java blanco.restautotest.task.BlancoRestAutotestBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -encoding=値5 -xmlrootelement=値6 -sheetType=値7 -lineSeparator=値8 -targetStyle=値9");
+        System.out.println("  java blanco.restautotest.task.BlancoRestAutotestBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -encoding=値5 -xmlrootelement=値6 -sheetType=値7 -lineSeparator=値8 -targetStyle=値9 -outputJson=値10");
         System.out.println("    -verbose");
         System.out.println("      説明[verboseモードで動作させるかどうか。]");
         System.out.println("      型[真偽]");
@@ -198,6 +200,10 @@ public class BlancoRestAutotestBatchProcess {
         System.out.println("      説明[出力先フォルダの書式を指定します。<br>\nblanco: [targetdir]/main<br>\nmaven: [targetdir]/main/java<br>\nfree: [targetdir](targetdirが無指定の場合はblanco/main)]");
         System.out.println("      型[文字列]");
         System.out.println("      デフォルト値[blanco]");
+        System.out.println("    -outputJson");
+        System.out.println("      説明[電文をJSONファイルとして出力します。]");
+        System.out.println("      型[真偽]");
+        System.out.println("      デフォルト値[true]");
         System.out.println("    -? , -help");
         System.out.println("      説明[使い方を表示します。]");
     }

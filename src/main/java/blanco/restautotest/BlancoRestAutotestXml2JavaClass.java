@@ -117,7 +117,9 @@ public class BlancoRestAutotestXml2JavaClass {
             final File argDirectoryTarget, final List<BlancoRestAutotestTestCaseData> argAllTestCaseData) throws IOException {
 
         // 得られた情報からJavaソースコードを生成します。
-        testCaseData2Json(argDirectoryTarget, argAllTestCaseData);
+        if (BlancoRestAutotestUtil.isOutputJson) {
+            testCaseData2Json(argDirectoryTarget, argAllTestCaseData);
+        }
     }
 
     public void testCaseData2Json(

@@ -24,6 +24,8 @@ public class BlancoRestAutotestUtil {
 
     /** デバグ情報を大量に出力します */
     public static boolean isVerbose = false;
+    /** 電文情報をJSONファイルとして出力します */
+    public static boolean isOutputJson = false;
 
     /** 現在処理中の InputResult シートの Input 欄の数 */
     public static int inputColumnMax = BlancoRestAutotestConstants.INPUT_MAX;
