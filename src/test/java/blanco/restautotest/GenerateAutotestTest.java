@@ -16,8 +16,8 @@ public class GenerateAutotestTest {
         input.setTmpdir("tmpTest");
         input.setTargetdir("sample/blanco");
         input.setTargetStyle("maven");
-        input.setVerbose(false);
-        input.setOutputJson(false);
+        input.setVerbose(true);
+        input.setOutputJson(true);
         input.setLineSeparator("LF");
 
         BlancoRestAutotestProcessImpl imple = new BlancoRestAutotestProcessImpl();

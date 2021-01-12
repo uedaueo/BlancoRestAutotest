@@ -1017,6 +1017,8 @@ public class BlancoRestAutotestXmlParser {
                         }
                         readLine += readLine0;
                     } else {
+                        readLine0 = 1;
+                        readLine++;
                         break;
                     }
                 }
