@@ -2,6 +2,7 @@ package blanco.restautotest;
 
 import blanco.restautotest.task.BlancoRestAutotestProcessImpl;
 import blanco.restautotest.task.valueobject.BlancoRestAutotestProcessInput;
+import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -24,6 +25,10 @@ public class GenerateAutotestTest {
         try {
             imple.execute(input);
 //            System.out.println("testCaseDataList = " + BlancoRestAutotestUtil.testCaseDataList);
+            for (BlancoRestAutotestTestCaseData testCaseData : BlancoRestAutotestUtil.testCaseDataList) {
+                String key = testCaseData.getTargetApiSimpleId() + "-" + testCaseData.getMethod() + "-" + testCaseData.getCaseId();
+                System.out.println(key);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

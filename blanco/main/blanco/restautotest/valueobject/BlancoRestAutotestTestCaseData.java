@@ -103,6 +103,13 @@ public class BlancoRestAutotestTestCaseData {
     private String fTargetApiSimpleId;
 
     /**
+     * このテストケースが対象とするHTTPメソッド
+     *
+     * フィールド: [method]。
+     */
+    private String fMethod;
+
+    /**
      * フィールド [input] の値を設定します。
      *
      * フィールドの説明: [テストケースの入力値を格納します。]。
@@ -391,6 +398,28 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
+     * フィールド [method] の値を設定します。
+     *
+     * フィールドの説明: [このテストケースが対象とするHTTPメソッド]。
+     *
+     * @param argMethod フィールド[method]に設定する値。
+     */
+    public void setMethod(final String argMethod) {
+        fMethod = argMethod;
+    }
+
+    /**
+     * フィールド [method] の値を取得します。
+     *
+     * フィールドの説明: [このテストケースが対象とするHTTPメソッド]。
+     *
+     * @return フィールド[method]から取得した値。
+     */
+    public String getMethod() {
+        return fMethod;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -418,6 +447,7 @@ public class BlancoRestAutotestTestCaseData {
         buf.append(",propertySizeMap=" + fPropertySizeMap);
         buf.append(",assertKindList=" + fAssertKindList);
         buf.append(",targetApiSimpleId=" + fTargetApiSimpleId);
+        buf.append(",method=" + fMethod);
         buf.append("]");
         return buf.toString();
     }
@@ -479,5 +509,8 @@ public class BlancoRestAutotestTestCaseData {
         // Name: fTargetApiSimpleId
         // Type: java.lang.String
         target.fTargetApiSimpleId = this.fTargetApiSimpleId;
+        // Name: fMethod
+        // Type: java.lang.String
+        target.fMethod = this.fMethod;
     }
 }

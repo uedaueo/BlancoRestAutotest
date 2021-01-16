@@ -114,7 +114,7 @@ public class BlancoRestAutotestXmlParser {
                 String requestId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Request";
                 String responseId = inputResultClassStructure.getPackage() + "." + inputResultClassStructure.getName() + BlancoNameAdjuster.toClassName(inputResultClassStructure.getMethod()) + "Response";
 
-                this.readInputResultValue(inputResultClassStructure.getName(), requestId, responseId, inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
+                this.readInputResultValue(inputResultClassStructure.getName(), requestId, responseId, inputResultClassStructure.getMethod(), inputResultClassStructure.getInputResultFieldList(), propertyMap, propertySizeMap, testCaseDataList);
 
             } else {
                 if (BlancoRestAutotestUtil.isVerbose) {
@@ -699,6 +699,7 @@ public class BlancoRestAutotestXmlParser {
             final String apiSimpleId,
             final String requestId,
             final String responseId,
+            final String methodId,
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final Map<String, String> argPropertyMap,
             final Map<String, Integer> argPropertySizeMap,
@@ -776,6 +777,7 @@ public class BlancoRestAutotestXmlParser {
             testCaseData.setPropertyMap(argPropertyMap);
             testCaseData.setPropertySizeMap(argPropertySizeMap);
             testCaseData.setAssertKindList(assertKindList);
+            testCaseData.setMethod(methodId);
 //            System.out.println("testCaseData = " + testCaseData);
             assertKindList = null;
         }
