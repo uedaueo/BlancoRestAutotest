@@ -2,11 +2,10 @@ package blanco.restautotest;
 
 import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoStringUtil;
-import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
-import blanco.restgenerator.valueobject.ApiTelegram;
 import blanco.restautotest.constants.BlancoRestAutotestConstants;
 import blanco.restautotest.valueobject.BlancoRestAutotestInputResultClassStructure;
-import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseClassStructure;
+import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
+import blanco.restgenerator.valueobject.ApiTelegram;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -160,12 +159,47 @@ public class BlancoRestAutotestUtil {
         method.invoke(parentObj, valueObj);
     }
 
-    public static void addToList(Object list, Object value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    /**
+     * List Object に、primitive ではない Object value を追加します。
+     * @param list
+     * @param value
+     */
+    public static void addToList(Object list, Object value) {
         if (list == null || value == null || !isArrayObject(list)) {
-            throw new IllegalArgumentException("setValue: arguments null.");
+            throw new IllegalArgumentException("addToList: arguments null.");
         }
         ((List)list).add(value);
     }
+
+    /**
+     * String 値 value を typeId で指定された primitive object に変換して、list Object に追加する。
+     * @param list
+     * @param value
+     * @param typeId
+     */
+    public static void addPrimitiveToList(Object list, String value, String typeId) {
+        if (typeId == null) {
+            throw new IllegalArgumentException("addPrimitiveToList: typeId null.");
+        }
+        Object valueObj = null;
+        if ("java.lang.Integer".equals(typeId)) {
+            valueObj = Integer.parseInt(value);
+        } else if ("java.lang.Long".equals(typeId)) {
+            valueObj = Long.parseLong(value);
+        } else if ("java.lang.Float".equals(typeId)) {
+            valueObj = Float.parseFloat(value);
+        } else if ("java.lang.Double".equals(typeId)) {
+            valueObj = Double.parseDouble(value);
+        } else if ("java.lang.Boolean".equals(typeId)) {
+            valueObj = Boolean.parseBoolean(value);
+        } else if ("java.lang.String".equals(typeId)) {
+            valueObj = value;
+        } else {
+            throw new IllegalArgumentException("addPrimitiveToList: It is not primitive: " + typeId);
+        }
+        addToList(list, valueObj);
+    }
+
 
     public static Object initObjectProperty(final Object object, final String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
         if (object == null || BlancoStringUtil.null2Blank(property).length() == 0) {

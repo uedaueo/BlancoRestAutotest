@@ -983,7 +983,7 @@ public class BlancoRestAutotestXmlParser {
                         String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, columnId);
                         if (value != null) {
                             if (!value.startsWith("#")) {
-                                BlancoRestAutotestUtil.addToList(propObj, value);
+                                BlancoRestAutotestUtil.addPrimitiveToList(propObj, value, genericObj.getClass().getName());
                                 if (BlancoRestAutotestUtil.isVerbose) {
                                     System.out.println(indent + "readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
                                 }

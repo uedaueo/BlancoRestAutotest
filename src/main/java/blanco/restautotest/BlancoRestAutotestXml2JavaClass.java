@@ -139,6 +139,7 @@ public class BlancoRestAutotestXml2JavaClass {
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
             printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
             String requestJson = mapper.writer(printer).writeValueAsString(testCaseData.getInput());
+            System.out.println("### " + testCaseData.getExpect());
             String responseJson = mapper.writer(printer).writeValueAsString(testCaseData.getExpect());
             String requestFileName = testCaseData.getSimpleInputId() + "-" + testCaseData.getCaseId() + ".json";
             String responseFileName = testCaseData.getSimpleExpectId() + "-" + testCaseData.getCaseId() + ".json";
