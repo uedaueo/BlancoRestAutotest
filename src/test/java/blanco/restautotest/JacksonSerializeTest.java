@@ -37,4 +37,16 @@ public class JacksonSerializeTest {
         }
         System.out.println(json);
     }
+
+    /*
+    fieldStructure.setInput30(BlancoXmlBindingUtil.getTextContent(elementList, "Input30"));
+    fieldStructure.setExpect30(BlancoXmlBindingUtil.getTextContent(elementList, "Expect30"));
+     */
+    @Test
+    @Ignore
+    public void myTest() {
+        for (int i = 31; i < 201; i++) {
+            System.out.println("fieldStructure.setExpect" + i + "(BlancoXmlBindingUtil.getTextContent(elementList, \"Expect" + i + "\"));");
+        }
+    }
 }

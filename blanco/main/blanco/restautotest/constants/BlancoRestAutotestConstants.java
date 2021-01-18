@@ -30,15 +30,15 @@ public class BlancoRestAutotestConstants {
 
     /**
      * 項目番号:5<br>
-     * inputのmax値(input1～input30)
+     * inputのmax値(input1～input200)
      */
-    public static final int INPUT_MAX = 30;
+    public static final int INPUT_MAX = 200;
 
     /**
      * 項目番号:6<br>
-     * outputのmax値(output1～output30)
+     * outputのmax値(output1～output200)
      */
-    public static final int OUTPUT_MAX = 30;
+    public static final int OUTPUT_MAX = 200;
 
     /**
      * 項目番号:7<br>
