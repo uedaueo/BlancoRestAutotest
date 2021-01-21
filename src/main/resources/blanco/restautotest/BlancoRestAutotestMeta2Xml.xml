@@ -96,20 +96,20 @@
                 <tablecolumn name="errorCode">
                     <value>e.code</value>
                 </tablecolumn>
-                <tablecolumn name="errorMesssage">
-                    <value>e.messsage</value>
+                <tablecolumn name="errorMessage">
+                    <value>e.message</value>
                 </tablecolumn>
-                <tablecolumn name="errorMesssageNumber">
-                    <value>e.messsageNumber</value>
+                <tablecolumn name="errorMessageNumber">
+                    <value>e.messageNumber</value>
                 </tablecolumn>
                 <tablecolumn name="messageCode">
                     <value>m.code</value>
                 </tablecolumn>
-                <tablecolumn name="messsageMessage">
-                    <value>m.messsage</value>
+                <tablecolumn name="messageMessage">
+                    <value>m.message</value>
                 </tablecolumn>
-                <tablecolumn name="messsageNumber">
-                    <value>m.messsageNumber</value>
+                <tablecolumn name="messageNumber">
+                    <value>m.messageNumber</value>
                 </tablecolumn>
                 <tablecolumn name="Bikou">
                     <value>備考</value>
