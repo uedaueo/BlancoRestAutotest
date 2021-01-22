@@ -1090,9 +1090,9 @@ public class BlancoRestAutotestXmlParser {
                     BlancoRestAutotestUtil.inputColumnMax,
                     argPropertySizeMap
             );
-            if (inputTelegram == null) {
-                throw new IllegalArgumentException("!!! Can not read Input data !!! for " + fieldStructure.getCaseId());
-            }
+//            if (inputTelegram == null) {
+//                throw new IllegalArgumentException("!!! Can not read Input data !!! for " + fieldStructure.getCaseId());
+//            }
             testCaseData.setInput(inputTelegram);
 
             /* 出力定義読込 */
@@ -1106,9 +1106,9 @@ public class BlancoRestAutotestXmlParser {
                     BlancoRestAutotestUtil.expectedColumnMax,
                     argPropertySizeMap
             );
-            if (expectTelegram == null) {
-                throw new IllegalArgumentException("!!! Can not read Expect data !!! for " + fieldStructure.getCaseId());
-            }
+//            if (expectTelegram == null) {
+//                throw new IllegalArgumentException("!!! Can not read Expect data !!! for " + fieldStructure.getCaseId());
+//            }
             testCaseData.setExpect(expectTelegram);
 
             testCaseData.setTargetApiSimpleId(apiSimpleId);
@@ -1183,6 +1183,10 @@ public class BlancoRestAutotestXmlParser {
                 String nextPropKey = propTree[0];
                 propSize = argPropertySizeMap.get(nextPropKey);
             }
+        }
+        if (readLine == 0) {
+            System.out.println("### createTelegram : NO DATA DEFINED!!!");
+            telegram = null;
         }
         return telegram;
     }
