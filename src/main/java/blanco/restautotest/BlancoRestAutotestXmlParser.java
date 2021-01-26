@@ -908,7 +908,7 @@ public class BlancoRestAutotestXmlParser {
 
     /**
      * 入出力定義書で配列の最終行のindexを返します。
-     * 最終行は #* のひとつ手前とします。
+     * 最終行は #* の行とします。
      *
      * @param argFieldStructureList
      * @param propertyTag Inputxx / Expectxx
@@ -935,9 +935,10 @@ public class BlancoRestAutotestXmlParser {
         }
 
         boolean found = false;
-        for (int index = searchStartIndex + 1; index < caseEndIndex ; index++) {
+        for (int index = searchStartIndex; index < caseEndIndex ; index++) {
             BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(index);
             if (BlancoStringUtil.null2Blank(fieldStructure.getNo()).length() == 0) {
+                /* countup せずに終わっていいかどうかは要検討 */
                 break;
             }
             String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, propertyTag);
@@ -1310,7 +1311,7 @@ public class BlancoRestAutotestXmlParser {
 
             int readLine0 = 0;
             int arrayCount = 0;
-            for (arrayCount = 0; arrayCount < arrayEndIndex + 1 - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
+            for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
                 Object genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, propId);
                 if (genericObj == null) {
                     throw new IllegalArgumentException("Array には総称型の指定が必須です。");
@@ -1325,22 +1326,18 @@ public class BlancoRestAutotestXmlParser {
                     BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
                     if (fieldStructure != null) {
                         String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, columnId);
-                        if (value != null) {
-                            if (!value.startsWith("#")) {
-                                BlancoRestAutotestUtil.addPrimitiveToList(propObj, value, genericObj.getClass().getName());
-                                if (BlancoRestAutotestUtil.isVerbose) {
-                                    System.out.println(indent + "readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
-                                }
-                            } else {
-                                if (BlancoRestAutotestUtil.isVerbose) {
-                                    System.out.println(indent + "readProperty array: primitive: " + value + " is ignored");
-                                }
+                        if (value != null && value.startsWith("#")) {
+                            if (BlancoRestAutotestUtil.isVerbose) {
+                                System.out.println(indent + "readProperty array: primitive: " + value + " is ignored");
                             }
-                            readLine0 = 1;
-                            readLine++;
                         } else {
-                            break;
+                            BlancoRestAutotestUtil.addPrimitiveToList(propObj, value, genericObj.getClass().getName());
+                            if (BlancoRestAutotestUtil.isVerbose) {
+                                System.out.println(indent + "readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
+                            }
                         }
+                        readLine0 = 1;
+                        readLine++;
                     }
                 } else {
                     readLine0 = readProperty(
@@ -1370,9 +1367,16 @@ public class BlancoRestAutotestXmlParser {
                 }
             }
 //            readLine += 1; /* 配列のターミネータ分 */
-            BlancoRestAutotestUtil.setValue(argParentObj, propId, propObj);
-            if (BlancoRestAutotestUtil.isVerbose) {
-                System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName() + " on " + propId);
+            if (((List)propObj).size() == 0) {
+                BlancoRestAutotestUtil.setValue(argParentObj, propId, null);
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is empty, so set null to " + argParentObj.getClass().getName() + " on " + propId);
+                }
+            } else {
+                BlancoRestAutotestUtil.setValue(argParentObj, propId, propObj);
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName() + " on " + propId);
+                }
             }
         } else {
             // Primitive でも Array でも無ければその他オブジェクトなので、次のプロパティチェックに進む

@@ -113,8 +113,8 @@ public class BlancoRestAutotestUtil {
      * @throws IllegalAccessException
      */
     public static void setValue(Object obj, String property, Object value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        if (obj == null || value == null || BlancoStringUtil.null2Blank(property).length() == 0) {
-            System.out.println("setValue: arguments null.");
+        if (obj == null || BlancoStringUtil.null2Blank(property).length() == 0) {
+            System.out.println("setValue: Target is null or not specified.");
             return;
         }
         Class<?> clazz = obj.getClass();
@@ -151,6 +151,9 @@ public class BlancoRestAutotestUtil {
         } else if ("java.lang.Boolean".equals(typeId)) {
             valueObj = Boolean.parseBoolean(value);
         } else if ("java.lang.String".equals(typeId)) {
+            if ("\"\"".equals(value)) {
+                value = "";
+            }
             valueObj = value;
         } else {
             throw new IllegalArgumentException("Cannot convert String to " + typeId);
@@ -165,8 +168,8 @@ public class BlancoRestAutotestUtil {
      * @param value
      */
     public static void addToList(Object list, Object value) {
-        if (list == null || value == null || !isArrayObject(list)) {
-            throw new IllegalArgumentException("addToList: arguments null.");
+        if (list == null || !isArrayObject(list)) {
+            throw new IllegalArgumentException("addToList: arguments is null or non array.");
         }
         ((List)list).add(value);
     }
@@ -182,7 +185,9 @@ public class BlancoRestAutotestUtil {
             throw new IllegalArgumentException("addPrimitiveToList: typeId null.");
         }
         Object valueObj = null;
-        if ("java.lang.Integer".equals(typeId)) {
+        if (value == null) {
+            valueObj = value;
+        } else if ("java.lang.Integer".equals(typeId)) {
             valueObj = Integer.parseInt(value);
         } else if ("java.lang.Long".equals(typeId)) {
             valueObj = Long.parseLong(value);
@@ -193,6 +198,9 @@ public class BlancoRestAutotestUtil {
         } else if ("java.lang.Boolean".equals(typeId)) {
             valueObj = Boolean.parseBoolean(value);
         } else if ("java.lang.String".equals(typeId)) {
+            if ("\"\"".equals(value)) {
+                value = "";
+            }
             valueObj = value;
         } else {
             throw new IllegalArgumentException("addPrimitiveToList: It is not primitive: " + typeId);
