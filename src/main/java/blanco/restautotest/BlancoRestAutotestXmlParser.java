@@ -958,6 +958,32 @@ public class BlancoRestAutotestXmlParser {
         return count;
     }
 
+    /**
+     * 入出力定義書で配列の最初の要素が [] の場合は、#* までに記述された要素は
+     * 全て無視し、空の配列として扱います。
+     *
+     * @param argFieldStructureList
+     * @param propertyTag Inputxx / Expectxx
+     * @param searchStartIndex fieldStrucureList に対する index
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private boolean isEmptyArray(
+            final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
+            final String propertyTag,
+            final int searchStartIndex
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        boolean isEmpty = false;
+        BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(searchStartIndex);
+        if (fieldStructure != null && BlancoStringUtil.null2Blank(fieldStructure.getNo()).length() > 0) {
+            String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, propertyTag);
+            isEmpty = "[]".equals(value);
+        }
+        return isEmpty;
+    }
+
     private String makePropertyTree(
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final int argColumnNumber,
@@ -1309,6 +1335,9 @@ public class BlancoRestAutotestXmlParser {
                 System.out.println(indent + "arrayEndIndex = " + arrayEndIndex);
             }
 
+            /* Input/Expect 定義で配列先頭要素が [] の場合は空配列として扱う。 */
+            boolean isEmptyArray = this.isEmptyArray(argFieldStructureList, columnId, argCaseLineStart);
+
             int readLine0 = 0;
             int arrayCount = 0;
             for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
@@ -1367,7 +1396,12 @@ public class BlancoRestAutotestXmlParser {
                 }
             }
 //            readLine += 1; /* 配列のターミネータ分 */
-            if (((List)propObj).size() == 0) {
+            if (isEmptyArray) {
+                BlancoRestAutotestUtil.setValue(argParentObj, propId, new ArrayList<>());
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is forced to be empty and set to " + argParentObj.getClass().getName() + " on " + propId);
+                }
+            } else if (((List)propObj).size() == 0) {
                 BlancoRestAutotestUtil.setValue(argParentObj, propId, null);
                 if (BlancoRestAutotestUtil.isVerbose) {
                     System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is empty, so set null to " + argParentObj.getClass().getName() + " on " + propId);
