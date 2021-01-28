@@ -1204,7 +1204,7 @@ public class BlancoRestAutotestXmlParser {
                         argPropertyMap,
                         argPropertySizeMap,
                         false,
-                        "");
+                        "", false);
                 readLine = Math.max(readLine, readLine0);
                 /* 次のプロパティで処理されたであろう幅を取得する */
                 String nextPropKey = propTree[0];
@@ -1231,6 +1231,7 @@ public class BlancoRestAutotestXmlParser {
      * @param argPropertyMap
      * @param argPropertySizeMap property のカラム番号を格納するmap
      * @param argNotSearchProp
+     * @param skipSetValue
      * @return このプロパティを読み取るために消費した行数
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
@@ -1250,7 +1251,8 @@ public class BlancoRestAutotestXmlParser {
             final Map<String, String> argPropertyMap,
             final Map<String, Integer> argPropertySizeMap,
             final boolean argNotSearchProp,
-            final String indent
+            final String indent,
+            final Boolean skipSetValue
     ) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
         if (argParentObj == null ||
                 argPropertyList == null ||
@@ -1300,7 +1302,7 @@ public class BlancoRestAutotestXmlParser {
             if (fieldStructure != null) {
                 String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, columnId);
                 if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(indent + "readProperty: primitive: " + value);
+                    System.out.println(indent + "readProperty: primitive: " + value + " skip ? " + skipSetValue);
                 }
                 if (value != null) {
                     /* ここで array の terminator チェック */
@@ -1308,7 +1310,13 @@ public class BlancoRestAutotestXmlParser {
                         this.terminateArrayDepth = value.length();
                         readLine = 0;
                     } else {
-                        BlancoRestAutotestUtil.setStringValue(argParentObj, propId, value);
+                        if (!skipSetValue) {
+                            BlancoRestAutotestUtil.setStringValue(argParentObj, propId, value);
+                        } else {
+                            if (BlancoRestAutotestUtil.isVerbose) {
+                                System.out.println(indent + "readProperty: primitive: SKIP TO SET VALUE.");
+                            }
+                        }
                         readLine = 1;
                     }
                 } else {
@@ -1337,6 +1345,9 @@ public class BlancoRestAutotestXmlParser {
 
             /* Input/Expect 定義で配列先頭要素が [] の場合は空配列として扱う。 */
             boolean isEmptyArray = this.isEmptyArray(argFieldStructureList, columnId, argCaseLineStart);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(indent + "isEmptyArray = " + isEmptyArray);
+            }
 
             int readLine0 = 0;
             int arrayCount = 0;
@@ -1359,10 +1370,14 @@ public class BlancoRestAutotestXmlParser {
                             if (BlancoRestAutotestUtil.isVerbose) {
                                 System.out.println(indent + "readProperty array: primitive: " + value + " is ignored");
                             }
-                        } else {
+                        } else if (!isEmptyArray) {
                             BlancoRestAutotestUtil.addPrimitiveToList(propObj, value, genericObj.getClass().getName());
                             if (BlancoRestAutotestUtil.isVerbose) {
                                 System.out.println(indent + "readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
+                            }
+                        } else {
+                            if (BlancoRestAutotestUtil.isVerbose) {
+                                System.out.println(indent + "readProperty array: primitive: " + value + " is ignored because of marked as empty array");
                             }
                         }
                         readLine0 = 1;
@@ -1381,7 +1396,8 @@ public class BlancoRestAutotestXmlParser {
                             argPropertyMap,
                             argPropertySizeMap,
                             true,
-                            indent + "  ");
+                            indent + "  ",
+                            isEmptyArray);
                     if (readLine0 > 0) {
                         BlancoRestAutotestUtil.addToList(propObj, genericObj);
                         if (BlancoRestAutotestUtil.isVerbose) {
@@ -1449,7 +1465,8 @@ public class BlancoRestAutotestXmlParser {
                         argPropertyMap,
                         argPropertySizeMap,
                         false,
-                        indent + "  ");
+                        indent + "  ",
+                        skipSetValue);
                 if (readLine0 > 0) {
                     hasValue = true;
                     readLine = Math.max(readLine, readLine0);

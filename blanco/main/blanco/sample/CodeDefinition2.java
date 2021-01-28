@@ -42,6 +42,11 @@ public class CodeDefinition2 {
     private String fMemo;
 
     /**
+     * フィールド: [numList]。
+     */
+    private ArrayList<Long> fNumList;
+
+    /**
      * フィールド [code] の値を設定します。
      *
      * フィールドの説明: [コード]。
@@ -152,6 +157,24 @@ public class CodeDefinition2 {
     }
 
     /**
+     * フィールド [numList] の値を設定します。
+     *
+     * @param argNumList フィールド[numList]に設定する値。
+     */
+    public void setNumList(final ArrayList<Long> argNumList) {
+        fNumList = argNumList;
+    }
+
+    /**
+     * フィールド [numList] の値を取得します。
+     *
+     * @return フィールド[numList]から取得した値。
+     */
+    public ArrayList<Long> getNumList() {
+        return fNumList;
+    }
+
+    /**
      * このバリューオブジェクトを指定のターゲットに複写します。
      *
      * <P>使用上の注意</P>
@@ -184,5 +207,8 @@ public class CodeDefinition2 {
         // Name: fMemo
         // Type: java.lang.String
         target.fMemo = this.fMemo;
+        // Name: fNumList
+        // Type: java.util.ArrayList
+        // フィールド[fNumList]はサポート外の型[java.util.ArrayListjava.lang.Long]です。
     }
 }
