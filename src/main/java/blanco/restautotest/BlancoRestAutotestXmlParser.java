@@ -1212,7 +1212,9 @@ public class BlancoRestAutotestXmlParser {
             }
         }
         if (readLine == 0) {
-            System.out.println("### createTelegram : NO DATA DEFINED!!!");
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println("### createTelegram : NO DATA DEFINED!!!");
+            }
             telegram = null;
         }
         return telegram;
