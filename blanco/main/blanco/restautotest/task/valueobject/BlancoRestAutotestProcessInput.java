@@ -83,6 +83,13 @@ public class BlancoRestAutotestProcessInput {
     private boolean fOutputJson = true;
 
     /**
+     * import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。
+     *
+     * フィールド: [searchTmpdir]。
+     */
+    private String fSearchTmpdir;
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [verboseモードで動作させるかどうか。]。
@@ -311,6 +318,28 @@ public class BlancoRestAutotestProcessInput {
     }
 
     /**
+     * フィールド [searchTmpdir] の値を設定します。
+     *
+     * フィールドの説明: [import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。]。
+     *
+     * @param argSearchTmpdir フィールド[searchTmpdir]に設定する値。
+     */
+    public void setSearchTmpdir(final String argSearchTmpdir) {
+        fSearchTmpdir = argSearchTmpdir;
+    }
+
+    /**
+     * フィールド [searchTmpdir] の値を取得します。
+     *
+     * フィールドの説明: [import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。]。
+     *
+     * @return フィールド[searchTmpdir]から取得した値。
+     */
+    public String getSearchTmpdir() {
+        return fSearchTmpdir;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -335,6 +364,7 @@ public class BlancoRestAutotestProcessInput {
         buf.append(",lineSeparator=" + fLineSeparator);
         buf.append(",targetStyle=" + fTargetStyle);
         buf.append(",outputJson=" + fOutputJson);
+        buf.append(",searchTmpdir=" + fSearchTmpdir);
         buf.append("]");
         return buf.toString();
     }
@@ -387,5 +417,8 @@ public class BlancoRestAutotestProcessInput {
         // Name: fOutputJson
         // Type: boolean
         target.fOutputJson = this.fOutputJson;
+        // Name: fSearchTmpdir
+        // Type: java.lang.String
+        target.fSearchTmpdir = this.fSearchTmpdir;
     }
 }

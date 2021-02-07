@@ -74,6 +74,11 @@ public class BlancoRestAutotestTask extends Task {
     protected boolean fIsFieldOutputJsonProcessed = false;
 
     /**
+     * フィールド [searchTmpdir] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldSearchTmpdirProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -301,7 +306,7 @@ public class BlancoRestAutotestTask extends Task {
     /**
      * Antタスクの[outputJson]アトリビュートのセッターメソッド。
      *
-     * 項目番号: 7<br>
+     * 項目番号: 9<br>
      * 電文をJSONファイルとして出力します。<br>
      *
      * @param arg セットしたい値
@@ -314,7 +319,7 @@ public class BlancoRestAutotestTask extends Task {
     /**
      * Antタスクの[outputJson]アトリビュートのゲッターメソッド。
      *
-     * 項目番号: 7<br>
+     * 項目番号: 9<br>
      * 電文をJSONファイルとして出力します。<br>
      * デフォルト値[true]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
      *
@@ -322,6 +327,31 @@ public class BlancoRestAutotestTask extends Task {
      */
     public boolean getOutputJson() {
         return fInput.getOutputJson();
+    }
+
+    /**
+     * Antタスクの[searchTmpdir]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 10<br>
+     * import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setSearchTmpdir(final String arg) {
+        fInput.setSearchTmpdir(arg);
+        fIsFieldSearchTmpdirProcessed = true;
+    }
+
+    /**
+     * Antタスクの[searchTmpdir]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 10<br>
+     * import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getSearchTmpdir() {
+        return fInput.getSearchTmpdir();
     }
 
     /**
@@ -349,6 +379,7 @@ public class BlancoRestAutotestTask extends Task {
             System.out.println("- lineSeparator:[" + getLineSeparator() + "]");
             System.out.println("- targetStyle:[" + getTargetStyle() + "]");
             System.out.println("- outputJson:[" + getOutputJson() + "]");
+            System.out.println("- searchTmpdir:[" + getSearchTmpdir() + "]");
         }
 
         try {

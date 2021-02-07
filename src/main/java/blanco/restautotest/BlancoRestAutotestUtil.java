@@ -3,18 +3,21 @@ package blanco.restautotest;
 import blanco.commons.util.BlancoNameAdjuster;
 import blanco.commons.util.BlancoStringUtil;
 import blanco.restautotest.constants.BlancoRestAutotestConstants;
+import blanco.restautotest.task.valueobject.BlancoRestAutotestProcessInput;
 import blanco.restautotest.valueobject.BlancoRestAutotestInputResultClassStructure;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
+import blanco.restgenerator.BlancoRestGeneratorConstants;
 import blanco.restgenerator.valueobject.ApiTelegram;
+import blanco.valueobject.BlancoValueObjectXmlParser;
+import blanco.valueobject.valueobject.BlancoValueObjectClassStructure;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * ユーティリティクラスです
@@ -34,6 +37,12 @@ public class BlancoRestAutotestUtil {
     public static int expectedColumnMax = BlancoRestAutotestConstants.OUTPUT_MAX;
     /** 現在処理中の InputResult シートの Expected プロパティ行の数 */
     public static int expectedNestDepth = Integer.MAX_VALUE;
+
+    /**
+     * 型が指定される場合があるので、ValueObject定義書から情報を読み取っておきます。
+     */
+    public static HashMap<String, BlancoValueObjectClassStructure> objects = new HashMap<>();
+
     /**
      * 今回のテストケース生成の対象となった、全てのテストケースクラスを保持します。
      */
@@ -49,6 +58,84 @@ public class BlancoRestAutotestUtil {
      * BlancoRestAutotestInputResultClassStructure で caseId が重複する場合はエラーにする。
      */
     public static Map<String, BlancoRestAutotestInputResultClassStructure> inputResults = new HashMap<>();
+
+
+    static public void processValueObjects(final BlancoRestAutotestProcessInput input) throws IOException {
+        if (isVerbose) {
+            System.out.println("BlancoRestAutotestUtil : processValueObjects start !");
+        }
+
+        /* tmpdir はみない */
+        /* searchTmpdir はカンマ区切り */
+        String tmpTmpdirs = input.getSearchTmpdir();
+        List<String> searchTmpdirList = null;
+        if (tmpTmpdirs != null) {
+            String[] searchTmpdirs = tmpTmpdirs.split(",");
+            searchTmpdirList = new ArrayList<>(Arrays.asList(searchTmpdirs));
+        }
+        if (searchTmpdirList == null) {
+            searchTmpdirList = new ArrayList<>();
+        }
+
+        for (String tmpdir : searchTmpdirList) {
+            searchTmpdir(tmpdir.trim());
+        }
+    }
+
+    static private void searchTmpdir(String tmpdir) {
+
+        // XML化された中間ファイルから情報を読み込む
+        final File[] fileMeta3 = new File(tmpdir
+                + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY)
+                .listFiles();
+
+        if (fileMeta3 == null) {
+            System.out.println("!!! NO FILES in " + tmpdir
+                    + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY);
+            throw new IllegalArgumentException("!!! NO FILES in " + tmpdir
+                    + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY);
+        }
+
+        for (int index = 0; index < fileMeta3.length; index++) {
+            if (fileMeta3[index].getName().endsWith(".xml") == false) {
+                continue;
+            }
+
+            BlancoValueObjectXmlParser parser = new BlancoValueObjectXmlParser();
+//            parser.setVerbose(this.isVerbose());
+            /*
+             * まず始めにすべてのシートを検索して，クラス名とpackage名のリストを作ります．
+             * php形式の定義書では，クラスを指定する際にpackage名が指定されていないからです．
+             *
+             */
+            final BlancoValueObjectClassStructure[] structures = parser.parse(fileMeta3[index]);
+
+            if (structures != null ) {
+                for (int index2 = 0; index2 < structures.length; index2++) {
+                    BlancoValueObjectClassStructure structure = structures[index2];
+                    if (structure != null) {
+                        if (isVerbose) {
+                            System.out.println("processValueObjects: " + structure.getName());
+                        }
+                        objects.put(structure.getName(), structure);
+                    } else {
+                        System.out.println("processValueObjects: a structure is NULL!!!");
+                    }
+                }
+            } else {
+                System.out.println("processValueObjects: structures are NULL!!!");
+            }
+        }
+    }
+
+    public static String getClassIdFromSimpleID(String simpleId) {
+        String voId = simpleId;
+        BlancoValueObjectClassStructure structure = objects.get(simpleId);
+        if (structure != null) {
+            voId = structure.getPackage() + "." + simpleId;
+        }
+        return voId;
+    }
 
     public static Object createObjectById(String objectId) {
         Class<?> clazz;
@@ -84,20 +171,26 @@ public class BlancoRestAutotestUtil {
         return (ApiTelegram) createObjectById(telegramId);
     }
 
-    public static Object getTelegramValue(ApiTelegram telegram, String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        return  getValue(telegram, property);
-    }
+//    public static Object getTelegramValue(ApiTelegram telegram, String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//        return  getValue(telegram, property);
+//    }
 
-    public static void setTelegramValue(ApiTelegram telegram, String property, Object value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        setValue(telegram, property, value);
-    }
+//    public static void setTelegramValue(ApiTelegram telegram, String property, Object value) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+//        setValue(telegram, property, value);
+//    }
 
     public static Object getValue(Object obj, String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         if (obj == null || BlancoStringUtil.null2Blank(property).length() == 0) {
             return null;
         }
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+
         Class<?> clazz = obj.getClass();
-        String getterId = "get" + BlancoNameAdjuster.toClassName(property);
+        String getterId = "get" + BlancoNameAdjuster.toClassName(propertyId);
         Method method = clazz.getMethod(getterId);
         return  method.invoke(obj);
     }
@@ -117,8 +210,16 @@ public class BlancoRestAutotestUtil {
             System.out.println("setValue: Target is null or not specified.");
             return;
         }
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+
+//        System.out.println("obj = " + obj.getClass().getName() + ", propertyId = " + propertyId + ", value = " + value.getClass().getName());
+
         Class<?> clazz = obj.getClass();
-        String setterId = "set" + BlancoNameAdjuster.toClassName(property);
+        String setterId = "set" + BlancoNameAdjuster.toClassName(propertyId);
         Method method = BlancoRestAutotestUtil.getMethodByName(clazz, setterId);
         if (method == null) {
             throw new NoSuchMethodException(obj.getClass().getName() + "." + setterId);
@@ -135,8 +236,14 @@ public class BlancoRestAutotestUtil {
         if (parentObj == null || value == null || BlancoStringUtil.null2Blank(property).length() == 0) {
             throw new IllegalArgumentException("setStringValue: arguments null.");
         }
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+
         Class<?> clazz = parentObj.getClass();
-        String setterId = "set" + BlancoNameAdjuster.toClassName(property);
+        String setterId = "set" + BlancoNameAdjuster.toClassName(propertyId);
         Method method = getMethodByName(clazz, setterId);
         String typeId = method.getParameterTypes()[0].getName();
         Object valueObj = value;
@@ -159,6 +266,7 @@ public class BlancoRestAutotestUtil {
             throw new IllegalArgumentException("Cannot convert String to " + typeId);
         }
 
+//        System.out.println("setValue : parentObj = " + parentObj.getClass().getName() + ", propertyId = " + propertyId + ", valueObj = " + valueObj.getClass().getName() + ", value = " + value);
         method.invoke(parentObj, valueObj);
     }
 
@@ -209,45 +317,45 @@ public class BlancoRestAutotestUtil {
     }
 
 
-    public static Object initObjectProperty(final Object object, final String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
-        if (object == null || BlancoStringUtil.null2Blank(property).length() == 0) {
-            System.out.println("initObjectProperty: arguments null.");
-            return null;
-        }
-        String blancoProp = "f" + BlancoNameAdjuster.toClassName(property);
-        Object propValue = BlancoRestAutotestUtil.getValue(object, property);
-        if (propValue == null) {
-            Field field = BlancoRestAutotestUtil.getFieldFromClass(object.getClass(), blancoProp);
-            System.out.println("XXXX " + field.getType().getName());
-            System.out.println("YYYY " + field.getGenericType().getTypeName());
-            BlancoRestAutotestUtil.setValue(
-                    object,
-                    property,
-                    createInstanceFromField(field)
-            );
-        }
-        return propValue;
-    }
+//    public static Object initObjectProperty(final Object object, final String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+//        if (object == null || BlancoStringUtil.null2Blank(property).length() == 0) {
+//            System.out.println("initObjectProperty: arguments null.");
+//            return null;
+//        }
+//        String blancoProp = "f" + BlancoNameAdjuster.toClassName(property);
+//        Object propValue = BlancoRestAutotestUtil.getValue(object, property);
+//        if (propValue == null) {
+//            Field field = BlancoRestAutotestUtil.getFieldFromClass(object.getClass(), blancoProp);
+//            System.out.println("XXXX " + field.getType().getName());
+//            System.out.println("YYYY " + field.getGenericType().getTypeName());
+//            BlancoRestAutotestUtil.setValue(
+//                    object,
+//                    property,
+//                    createInstanceFromField(field)
+//            );
+//        }
+//        return propValue;
+//    }
 
-    public static Object initProperty(final Object object, final String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
-        Field field = BlancoRestAutotestUtil.getFieldFromBlancoValueObject(object, property);
-        Object propValue = BlancoRestAutotestUtil.getValue(object, property);
-        if (propValue == null) {
-            System.out.println("XXXX " + field.getType().getName());
-            System.out.println("YYYY " + field.getGenericType().getTypeName());
-            BlancoRestAutotestUtil.setValue(
-                    object,
-                    property,
-                    createInstanceFromField(field)
-            );
-        }
-        Object genericObj = createSimpleGenericFromField(field);
-        if (isArrayField(field) && genericObj != null) {
-
-            return genericObj;
-        }
-        return propValue;
-    }
+//    public static Object initProperty(final Object object, final String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
+//        Field field = BlancoRestAutotestUtil.getFieldFromBlancoValueObject(object, property);
+//        Object propValue = BlancoRestAutotestUtil.getValue(object, property);
+//        if (propValue == null) {
+//            System.out.println("XXXX " + field.getType().getName());
+//            System.out.println("YYYY " + field.getGenericType().getTypeName());
+//            BlancoRestAutotestUtil.setValue(
+//                    object,
+//                    property,
+//                    createInstanceFromField(field)
+//            );
+//        }
+//        Object genericObj = createSimpleGenericFromField(field);
+//        if (isArrayField(field) && genericObj != null) {
+//
+//            return genericObj;
+//        }
+//        return propValue;
+//    }
 
     /**
      * Field 情報から Generic で指定されているクラスのインスタンスを返す。
@@ -436,15 +544,24 @@ public class BlancoRestAutotestUtil {
     }
 
     public static Object createObjectFromProperty(Object parentObj, String property) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
-        Field field = getFieldFromBlancoValueObject(parentObj, property);
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+        Field field = getFieldFromBlancoValueObject(parentObj, propertyId);
         return createInstanceFromField(field);
     }
 
     public static Object createGenericFromProperty(Object parentObj, String property) throws NoSuchFieldException {
-        Field field = getFieldFromBlancoValueObject(parentObj, property);
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+        Field field = getFieldFromBlancoValueObject(parentObj, propertyId);
         return createSimpleGenericFromField(field);
     }
-
 
     /**
      * Make canonical classname into Simple.

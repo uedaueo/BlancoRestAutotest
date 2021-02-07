@@ -1021,6 +1021,17 @@ public class BlancoRestAutotestXmlParser {
                     }
                 }
                 /*
+                 * hoge[]:ClassName.fuga.bar 的な感じで、パラメータのクラスを指定できるようにする。
+                 * 配列を表す [] 部分は捨てるが、:ClassName 部分はそのまま保持し、
+                 * 型名確定時に処理する。
+                 */
+                String [] arrayValue = value.split(":");
+                String typeId = "";
+                if (arrayValue.length > 1) {
+                    value = arrayValue[0];
+                    typeId = arrayValue[1].trim();
+                }
+                /*
                  * テストケース作成者の見やすさのために、配列の場合はプロパティ名の後ろに [] を付与することを許可する。（あれば無視するだけ。型チェックとかはしない。）
                  * また、半角スペースより後ろも無視する。
                  */
@@ -1034,6 +1045,9 @@ public class BlancoRestAutotestXmlParser {
                 };
 //                System.out.println("makePropertyTree: (" + argDepth + "," + index + ") " + value);
 
+                if (typeId.length() > 0) {
+                    value = value + ":" + typeId;
+                }
                 String propertyList = BlancoStringUtil.null2Blank(argParentProperties).length() > 0 ? argParentProperties + "." + value : value;
                 argPropertyMap.put(tag, propertyList);
                 makePropertyTree(argFieldStructureList,
@@ -1279,6 +1293,13 @@ public class BlancoRestAutotestXmlParser {
 
         if (BlancoRestAutotestUtil.isVerbose) {
             System.out.println(indent + "START readProperty : parentObj = " + argParentObj.getClass().getName() + ", columnId = " + columnId + ", propId = " + propId + ", caseLineStart = " + argCaseLineStart + ", argNotSearchProp = " + argNotSearchProp);
+            System.out.println(indent + "parentObj = " + argParentObj);
+        }
+
+        Boolean isTypeSpecified = false;
+        String [] typedPropId = propId.split(":");
+        if (typedPropId.length > 1) {
+            isTypeSpecified = true;
         }
 
         Object propObj = argParentObj;
@@ -1289,8 +1310,21 @@ public class BlancoRestAutotestXmlParser {
             }
         }
 
+        if (isTypeSpecified &&
+                !argNotSearchProp &&
+                !BlancoRestAutotestUtil.isArrayObject(propObj) &&
+                !BlancoRestAutotestUtil.isPrimitiveObject(argParentObj)
+        ) {
+            String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
+            if (BlancoStringUtil.null2Blank(classId).length() == 0) {
+                throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
+            }
+            propObj = BlancoRestAutotestUtil.createObjectById(classId);
+        }
+
         if (BlancoRestAutotestUtil.isVerbose) {
-            System.out.println(indent + "      readProperty : propObj = " + propObj.getClass().getName());
+            System.out.println(indent + "readProperty : propObj = " + propObj.getClass().getName());
+            System.out.println(indent + "                         " + propObj);
         }
 
         /*
@@ -1354,13 +1388,23 @@ public class BlancoRestAutotestXmlParser {
             int readLine0 = 0;
             int arrayCount = 0;
             for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
-                Object genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, propId);
+                Object genericObj = null;
+                if (isTypeSpecified) {
+                    String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
+                    if (BlancoStringUtil.null2Blank(classId).length() == 0) {
+                        throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
+                    }
+                    genericObj = BlancoRestAutotestUtil.createObjectById(classId);
+                } else {
+                    genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, propId);
+                }
                 if (genericObj == null) {
                     throw new IllegalArgumentException("Array には総称型の指定が必須です。");
                 }
                 if (arrayCount == 0) {
                     if (BlancoRestAutotestUtil.isVerbose) {
                         System.out.println(indent + "Generci = " + genericObj.getClass().getName());
+                        System.out.println(indent + "          " + genericObj);
                     }
                 }
                 boolean isPrimitiveGeneric = BlancoRestAutotestUtil.isPrimitiveObject(genericObj);
@@ -1403,6 +1447,7 @@ public class BlancoRestAutotestXmlParser {
                     if (readLine0 > 0) {
                         BlancoRestAutotestUtil.addToList(propObj, genericObj);
                         if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(indent + "generic = " + genericObj);
                             System.out.println(indent + "readProperty array: " + genericObj.getClass().getName() + " is pushed to " + propObj.getClass().getName());
                         }
                         readLine += readLine0;

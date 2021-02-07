@@ -100,6 +100,11 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
                 System.out.println("/* tueda */ TARGETDIR = " + strTarget);
             }
 
+            /*
+             * ValueObject定義書から生成されているはずの xml を読み込む
+             */
+            BlancoRestAutotestUtil.processValueObjects(input);
+
             // テンポラリディレクトリを作成。
             new File(input.getTmpdir()
                     + BlancoRestAutotestConstants.TARGET_SUBDIRECTORY).mkdirs();

@@ -185,9 +185,30 @@ public class BlancoRestAutotestMessage {
     }
 
     /**
+     * メッセージ定義ID[BlancoRestAutotest]、キー[MBVOJI09]の文字列を取得します。
+     *
+     * No.10:
+     * 文字列[入出力[{0}] で、型[{1}]が定義されていますがそれは存在しません。]
+     *
+     * @param arg0 置換文字列{0}の値。
+     * @param arg1 置換文字列{1}の値。
+     * @return メッセージ文字列。
+     */
+    public String getMbvoji09(final String arg0, final String arg1) {
+        if (arg0 == null) {
+            throw new IllegalArgumentException("メソッド[getMbvoji09]のパラメータ[arg0]にnullが与えられました。しかし、このパラメータにnullを与えることはできません。");
+        }
+        if (arg1 == null) {
+            throw new IllegalArgumentException("メソッド[getMbvoji09]のパラメータ[arg1]にnullが与えられました。しかし、このパラメータにnullを与えることはできません。");
+        }
+
+        return "[MBVOJI09] " + fBundle.getMbvoji09(arg0, arg1);
+    }
+
+    /**
      * メッセージ定義ID[BlancoRestAutotest]、キー[MBVOJA01]の文字列を取得します。
      *
-     * No.12:
+     * No.13:
      * 文字列[メタディレクトリ[{0}]が存在しません。]
      *
      * @param arg0 置換文字列{0}の値。

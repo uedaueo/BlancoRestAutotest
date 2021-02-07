@@ -5,7 +5,7 @@
 	<groupId>blanco.restautotest</groupId>
 	<artifactId>blanco-restautotest</artifactId>
 	<packaging>jar</packaging>
-	<version>0.0.10</version>
+	<version>0.0.11</version>
 	<name>blanco-restautotest</name>
 
 	<!-- basic spec for jar -->
@@ -399,6 +399,7 @@
 									encoding="UTF-8"
 									sheetType="php"
 									tmpdir="tmpTest"
+									searchTmpdir="tmp/api"
 									targetdir="sample/blanco"
 									targetStyle="maven"
 									verbose="true"
