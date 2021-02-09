@@ -141,7 +141,7 @@ public class BlancoRestAutotestUtil {
                 .listFiles();
 
         if (fileMeta3 == null) {
-            System.out.println("!!! SKIPI NO FILES in " + tmpdir
+            System.out.println("searchTelegramTmpdir !!! SKIPI NO FILES in " + tmpdir
                     + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY);
             return;
         }
@@ -161,7 +161,7 @@ public class BlancoRestAutotestUtil {
             final BlancoXmlDocument documentMeta = new BlancoXmlUnmarshaller()
                     .unmarshal(fileMeta3[index]);
             if (documentMeta == null) {
-                System.out.println("Fail to unmarshal XML.");
+                System.out.println("searchTelegramTmpdir Fail to unmarshal XML.");
                 continue;
             }
 
@@ -171,20 +171,26 @@ public class BlancoRestAutotestUtil {
             if (elementRoot == null) {
                 // ルートエレメントが無い場合には処理中断します。
                 if (isVerbose) {
-                    System.out.println("praser !!! NO ROOT ELEMENT !!!");
+                    System.out.println("searchTelegramTmpdir praser !!! NO ROOT ELEMENT !!!");
                 }
                 continue;
             }
 
             if (isVerbose) {
-                System.out.println("[" + fileMeta3[index].getName() + "の処理を開始します]");
+                System.out.println("searchTelegramTmpdir [" + fileMeta3[index].getName() + "の処理を開始します]");
             }
             Map<String, BlancoRestGeneratorTelegram> telegramStructureMap = parser.parseTelegrams(elementRoot);
 
             /* telegramStructure から必要な情報を取得して、ValueObjectStructure に詰め直します。 */
-            if (telegramStructureMap != null ) {
+            if (telegramStructureMap != null && telegramStructureMap.size() > 0) {
                 Set<String> keySet = telegramStructureMap.keySet();
                 for (String key : keySet) {
+                    if (key == null) {
+                        if (isVerbose) {
+                            System.out.println("!!! WARN !!! searchTelegramTmpdir: key is null. continue.");
+                        }
+                        continue;
+                    }
                     BlancoRestGeneratorTelegram telegram = telegramStructureMap.get(key);
                     if (telegram == null) {
                         System.out.println("searchTelegramTmpdir: telegramStructure for " + key + " not defined.");
@@ -192,7 +198,7 @@ public class BlancoRestAutotestUtil {
                     }
                     BlancoValueObjectClassStructure voStructure = new BlancoValueObjectClassStructure();
                     if (objects.containsKey(key)) {
-                        System.out.println("!!! WARN !!! Duplicate Key : " + key);
+                        System.out.println("!!! WARN !!! searchTelegramTmpdir Duplicate Key : " + key);
                     }
                     objects.put(key, voStructure);
                     voStructure.setName(telegram.getName());
@@ -201,7 +207,7 @@ public class BlancoRestAutotestUtil {
                     /* package だけあればいいかも */
                 }
             } else {
-                System.out.println("searchTelegramTmpdir: structures are NULL!!!");
+                System.out.println("searchTelegramTmpdir: structures are EMPTY or NULL!!!");
             }
         }
     }
