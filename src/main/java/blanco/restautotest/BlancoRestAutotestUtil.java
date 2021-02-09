@@ -96,10 +96,9 @@ public class BlancoRestAutotestUtil {
                 .listFiles();
 
         if (fileMeta3 == null) {
-            System.out.println("!!! NO FILES in " + tmpdir
+            System.out.println("!!! SKIP NO FILES in " + tmpdir
                     + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY);
-            throw new IllegalArgumentException("!!! NO FILES in " + tmpdir
-                    + BlancoRestGeneratorConstants.OBJECT_SUBDIRECTORY);
+            return;
         }
 
         for (int index = 0; index < fileMeta3.length; index++) {
@@ -142,10 +141,9 @@ public class BlancoRestAutotestUtil {
                 .listFiles();
 
         if (fileMeta3 == null) {
-            System.out.println("!!! NO FILES in " + tmpdir
+            System.out.println("!!! SKIPI NO FILES in " + tmpdir
                     + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY);
-            throw new IllegalArgumentException("!!! NO FILES in " + tmpdir
-                    + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY);
+            return;
         }
 
         for (int index = 0; index < fileMeta3.length; index++) {

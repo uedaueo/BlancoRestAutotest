@@ -15,7 +15,7 @@ public class GenerateAutotestTest {
         input.setEncoding("UTF-8");
         input.setSheetType("php");
         input.setTmpdir("tmpTest");
-        input.setSearchTmpdir("tmp/api");
+        input.setSearchTmpdir("tmp/api,tmp/telegrams");
         input.setTargetdir("sample/blanco");
         input.setTargetStyle("maven");
         input.setVerbose(true);
