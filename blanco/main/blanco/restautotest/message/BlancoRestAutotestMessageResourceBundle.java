@@ -296,6 +296,30 @@ class BlancoRestAutotestMessageResourceBundle {
     }
 
     /**
+     * bundle[BlancoRestAutotestMessage], key[MBVOJI10]
+     *
+     * [電文クラス[{0}] の情報が存在しません。] (ja)<br>
+     *
+     * @param arg0 置換文字列{0}を置換する値。java.lang.String型を与えてください。
+     * @return key[MBVOJI10]に対応する値。外部から読み込みができない場合には、定義書の値を戻します。必ずnull以外の値が戻ります。
+     */
+    public String getMbvoji10(final String arg0) {
+        // 初期値として定義書の値を利用します。
+        String strFormat = "電文クラス[{0}] の情報が存在しません。";
+        try {
+            if (fResourceBundle != null) {
+                strFormat = fResourceBundle.getString("MBVOJI10");
+            }
+        } catch (MissingResourceException ex) {
+        }
+        final MessageFormat messageFormat = new MessageFormat(strFormat);
+        final StringBuffer strbuf = new StringBuffer();
+        // 与えられた引数を元に置換文字列を置き換えます。
+        messageFormat.format(new Object[] {arg0}, strbuf, null);
+        return strbuf.toString();
+    }
+
+    /**
      * bundle[BlancoRestAutotestMessage], key[MBVOJA01]
      *
      * [メタディレクトリ[{0}]が存在しません。] (ja)<br>

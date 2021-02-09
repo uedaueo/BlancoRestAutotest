@@ -4,6 +4,7 @@
 package blanco.sample;
 
 import blanco.restgenerator.valueobject.ApiPostTelegram;
+import blanco.restgenerator.valueobject.ApiTelegram;
 
 /**
  * blancoRestのサンプルAPIの要求電文です。
@@ -12,29 +13,29 @@ public class GetTableSample5PostRequest extends ApiPostTelegram {
     /**
      * フィールド [id]
      *
-     * 項目の型 [java.lang.String]
+     * 項目の型 [blanco.restgenerator.valueobject.ApiTelegram]
      */
-    private String fId;
+    private ApiTelegram fId;
 
     /**
      * フィールド [id]のセッターメソッド
      *
-     * 項目の型 [java.lang.String]
+     * 項目の型 [blanco.restgenerator.valueobject.ApiTelegram]
      *
      * @param argId フィールド[id]に格納したい値
      */
-    public void setId(final String argId) {
+    public void setId(final ApiTelegram argId) {
         this.fId = argId;
     }
 
     /**
      * フィールド[id]のゲッターメソッド
      *
-     * 項目の型 [java.lang.String]
+     * 項目の型 [blanco.restgenerator.valueobject.ApiTelegram]
      *
      * @return フィールド[id]に格納されている値
      */
-    public String getId() {
+    public ApiTelegram getId() {
         return this.fId;
     }
 
@@ -46,7 +47,7 @@ public class GetTableSample5PostRequest extends ApiPostTelegram {
      * @return フィールド[id]の型名文字列
      */
     public static String typeId() {
-        return "java.lang.String";
+        return "blanco.restgenerator.valueobject.ApiTelegram";
     }
 
     /**
@@ -60,7 +61,7 @@ public class GetTableSample5PostRequest extends ApiPostTelegram {
     public String toString() {
         java.lang.String buf = "";
         buf = buf + "blanco.sample.GetTableSample5PostRequest[";
-        buf = buf + "id=" + this.fId;
+        buf = buf + "id=" +  this.fId;
         buf = buf + "]";
         return buf;
     }

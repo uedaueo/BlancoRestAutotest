@@ -7,9 +7,15 @@ import blanco.restautotest.task.valueobject.BlancoRestAutotestProcessInput;
 import blanco.restautotest.valueobject.BlancoRestAutotestInputResultClassStructure;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 import blanco.restgenerator.BlancoRestGeneratorConstants;
+import blanco.restgenerator.BlancoRestGeneratorXmlParser;
 import blanco.restgenerator.valueobject.ApiTelegram;
+import blanco.restgenerator.valueobject.BlancoRestGeneratorTelegram;
 import blanco.valueobject.BlancoValueObjectXmlParser;
 import blanco.valueobject.valueobject.BlancoValueObjectClassStructure;
+import blanco.xml.bind.BlancoXmlBindingUtil;
+import blanco.xml.bind.BlancoXmlUnmarshaller;
+import blanco.xml.bind.valueobject.BlancoXmlDocument;
+import blanco.xml.bind.valueobject.BlancoXmlElement;
 
 import java.io.File;
 import java.io.IOException;
@@ -59,7 +65,6 @@ public class BlancoRestAutotestUtil {
      */
     public static Map<String, BlancoRestAutotestInputResultClassStructure> inputResults = new HashMap<>();
 
-
     static public void processValueObjects(final BlancoRestAutotestProcessInput input) throws IOException {
         if (isVerbose) {
             System.out.println("BlancoRestAutotestUtil : processValueObjects start !");
@@ -78,11 +83,12 @@ public class BlancoRestAutotestUtil {
         }
 
         for (String tmpdir : searchTmpdirList) {
-            searchTmpdir(tmpdir.trim());
+            searchValueObjectTmpdir(tmpdir.trim());
+            searchTelegramTmpdir(tmpdir.trim());
         }
     }
 
-    static private void searchTmpdir(String tmpdir) {
+    static private void searchValueObjectTmpdir(String tmpdir) {
 
         // XML化された中間ファイルから情報を読み込む
         final File[] fileMeta3 = new File(tmpdir
@@ -124,6 +130,80 @@ public class BlancoRestAutotestUtil {
                 }
             } else {
                 System.out.println("processValueObjects: structures are NULL!!!");
+            }
+        }
+    }
+
+    static private void searchTelegramTmpdir(String tmpdir) {
+
+        // XML化された中間ファイルから情報を読み込む
+        final File[] fileMeta3 = new File(tmpdir
+                + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY)
+                .listFiles();
+
+        if (fileMeta3 == null) {
+            System.out.println("!!! NO FILES in " + tmpdir
+                    + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY);
+            throw new IllegalArgumentException("!!! NO FILES in " + tmpdir
+                    + BlancoRestGeneratorConstants.TARGET_SUBDIRECTORY);
+        }
+
+        for (int index = 0; index < fileMeta3.length; index++) {
+            if (fileMeta3[index].getName().endsWith(".xml") == false) {
+                continue;
+            }
+
+            BlancoRestGeneratorXmlParser parser = new BlancoRestGeneratorXmlParser();
+//            parser.setVerbose(this.isVerbose());
+            /*
+             * まず始めにすべてのシートを検索して，クラス名とpackage名のリストを作ります．
+             * php形式の定義書では，クラスを指定する際にpackage名が指定されていないからです．
+             *
+             */
+            final BlancoXmlDocument documentMeta = new BlancoXmlUnmarshaller()
+                    .unmarshal(fileMeta3[index]);
+            if (documentMeta == null) {
+                System.out.println("Fail to unmarshal XML.");
+                continue;
+            }
+
+            // ルートエレメントを取得します。
+            final BlancoXmlElement elementRoot = BlancoXmlBindingUtil
+                    .getDocumentElement(documentMeta);
+            if (elementRoot == null) {
+                // ルートエレメントが無い場合には処理中断します。
+                if (isVerbose) {
+                    System.out.println("praser !!! NO ROOT ELEMENT !!!");
+                }
+                continue;
+            }
+
+            if (isVerbose) {
+                System.out.println("[" + fileMeta3[index].getName() + "の処理を開始します]");
+            }
+            Map<String, BlancoRestGeneratorTelegram> telegramStructureMap = parser.parseTelegrams(elementRoot);
+
+            /* telegramStructure から必要な情報を取得して、ValueObjectStructure に詰め直します。 */
+            if (telegramStructureMap != null ) {
+                Set<String> keySet = telegramStructureMap.keySet();
+                for (String key : keySet) {
+                    BlancoRestGeneratorTelegram telegram = telegramStructureMap.get(key);
+                    if (telegram == null) {
+                        System.out.println("searchTelegramTmpdir: telegramStructure for " + key + " not defined.");
+                        continue;
+                    }
+                    BlancoValueObjectClassStructure voStructure = new BlancoValueObjectClassStructure();
+                    if (objects.containsKey(key)) {
+                        System.out.println("!!! WARN !!! Duplicate Key : " + key);
+                    }
+                    objects.put(key, voStructure);
+                    voStructure.setName(telegram.getName());
+                    voStructure.setDescription(telegram.getDescription());
+                    voStructure.setPackage(telegram.getPackage());
+                    /* package だけあればいいかも */
+                }
+            } else {
+                System.out.println("searchTelegramTmpdir: structures are NULL!!!");
             }
         }
     }
