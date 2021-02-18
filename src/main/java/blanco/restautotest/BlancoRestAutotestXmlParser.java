@@ -13,6 +13,7 @@ import blanco.xml.bind.valueobject.BlancoXmlDocument;
 import blanco.xml.bind.valueobject.BlancoXmlElement;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +41,7 @@ public class BlancoRestAutotestXmlParser {
      *            中間XMLファイル。
      */
     public List<BlancoRestAutotestTestCaseData> parseTestCase(
-            final File argMetaXmlSourceFile) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+            final File argMetaXmlSourceFile) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException, IOException {
         final BlancoXmlDocument documentMeta = new BlancoXmlUnmarshaller()
                 .unmarshal(argMetaXmlSourceFile);
         if (documentMeta == null) {
@@ -69,7 +70,7 @@ public class BlancoRestAutotestXmlParser {
      *
      * @param argElementRoot
      */
-    public List<BlancoRestAutotestTestCaseData> parseInputResult(final BlancoXmlElement argElementRoot) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException {
+    public List<BlancoRestAutotestTestCaseData> parseInputResult(final BlancoXmlElement argElementRoot) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchFieldException, IOException {
 
         List<BlancoRestAutotestTestCaseData> testCaseDataList = new ArrayList<>();
 
@@ -954,7 +955,7 @@ public class BlancoRestAutotestXmlParser {
         } else {
             count = searchStartIndex + count - 1;
         }
-//        System.out.println("getArrayLineSize: count = " + count)
+//        System.out.println("getArrayLineSize: count = " + count);
         return count;
     }
 
@@ -1085,11 +1086,11 @@ public class BlancoRestAutotestXmlParser {
             final Map<String, String> argPropertyMap,
             final Map<String, Integer> argPropertySizeMap,
             final List<BlancoRestAutotestTestCaseData> argTestCaseDataList
-    ) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+    ) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException, IOException {
         int startLine = Math.max(BlancoRestAutotestUtil.inputNestDepth, BlancoRestAutotestUtil.expectedNestDepth);
 
         int caseLineSize = Integer.MAX_VALUE;
-        List<String> assertKindList = null;
+        Map<String, List<String>> assertKindListMap = null;
         for (int index = startLine; index < argFieldStructureList.size() && caseLineSize > 0; index += caseLineSize) {
             if (BlancoRestAutotestUtil.isVerbose) {
                 System.out.println("INDEX: " + index);
@@ -1097,7 +1098,7 @@ public class BlancoRestAutotestXmlParser {
             BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(index);
             if (fieldStructure.getKind().equals(BlancoRestAutotestConstants.INPUT_RESULT_KIND_ASSERT)) {
                 /* 比較方法行は読み込んで次へ */
-                assertKindList = this.getAssertKindList(fieldStructure);
+                assertKindListMap = this.getAssertKindListMap(fieldStructure);
 //                System.out.println("!!! GET Assert Kind List !!!");
                 caseLineSize = 1;
                 continue;
@@ -1122,6 +1123,8 @@ public class BlancoRestAutotestXmlParser {
 
             /* 入力定義読込 */
             ApiTelegram inputTelegram = this.createTelegram(
+                    apiSimpleId,
+                    methodId,
                     requestId,
                     argFieldStructureList,
                     index,
@@ -1129,7 +1132,8 @@ public class BlancoRestAutotestXmlParser {
                     argPropertyMap,
                     "Input",
                     BlancoRestAutotestUtil.inputColumnMax,
-                    argPropertySizeMap
+                    argPropertySizeMap,
+                    assertKindListMap.get("input")
             );
 //            if (inputTelegram == null) {
 //                throw new IllegalArgumentException("!!! Can not read Input data !!! for " + fieldStructure.getCaseId());
@@ -1138,6 +1142,8 @@ public class BlancoRestAutotestXmlParser {
 
             /* 出力定義読込 */
             ApiTelegram expectTelegram = this.createTelegram(
+                    apiSimpleId,
+                    methodId,
                     responseId,
                     argFieldStructureList,
                     index,
@@ -1145,7 +1151,8 @@ public class BlancoRestAutotestXmlParser {
                     argPropertyMap,
                     "Expect",
                     BlancoRestAutotestUtil.expectedColumnMax,
-                    argPropertySizeMap
+                    argPropertySizeMap,
+                    assertKindListMap.get("expect")
             );
 //            if (expectTelegram == null) {
 //                throw new IllegalArgumentException("!!! Can not read Expect data !!! for " + fieldStructure.getCaseId());
@@ -1157,45 +1164,62 @@ public class BlancoRestAutotestXmlParser {
             testCaseData.setExpectedColumnMax(BlancoRestAutotestUtil.expectedColumnMax);
             testCaseData.setPropertyMap(argPropertyMap);
             testCaseData.setPropertySizeMap(argPropertySizeMap);
-            testCaseData.setAssertKindList(assertKindList);
+            testCaseData.setAssertKindListMap(assertKindListMap);
             testCaseData.setMethod(methodId);
 //            System.out.println("testCaseData = " + testCaseData);
-            assertKindList = null;
+            assertKindListMap = null;
         }
     }
 
-    private List<String> getAssertKindList(
+    private Map<String, List<String>> getAssertKindListMap(
             final BlancoRestAutotestInputResultFieldStructure argFieldStructure
     ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         if (!argFieldStructure.getKind().equals(BlancoRestAutotestConstants.INPUT_RESULT_KIND_ASSERT)) {
             return null;
         }
-        List<String> assertKindList = new ArrayList<>();
+        Map<String, List<String>> assertKindListMap = new HashMap<>();
+        /* Input side */
+        assertKindListMap.put("input", new ArrayList<>());
+        for (int index = 0; index < BlancoRestAutotestUtil.inputColumnMax; index++) {
+            String kind = BlancoRestAutotestUtil.getStringValue(argFieldStructure, "Input" + (index + 1));
+            if (kind != null) {
+                assertKindListMap.get("input").add(kind);
+            } else {
+                assertKindListMap.get("input").add(null);
+            }
+        }
+        /* Expect side */
+        assertKindListMap.put("expect", new ArrayList<>());
         for (int index = 0; index < BlancoRestAutotestUtil.expectedColumnMax; index++) {
             String kind = BlancoRestAutotestUtil.getStringValue(argFieldStructure, "Expect" + (index + 1));
             if (kind != null) {
-                assertKindList.add(kind);
+                assertKindListMap.get("expect").add(kind);
             } else {
-                throw new IllegalArgumentException(fMsg.getMbvoji07("比較方法", "kind"));
+                throw new IllegalArgumentException(fMsg.getMbvoji07("比較方法 expect", "kind"));
             }
         }
-        return assertKindList;
+        return assertKindListMap;
     }
 
     public ApiTelegram createTelegram(
-            final String telegramId,
+            final String argApiSimpleId,
+            final String argMethodId,
+            final String argTelegramId,
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final int caseStartIndex,
             final int caselineMax,
             final Map<String, String> argPropertyMap,
             final String argPropertyTag,
             final int argPropertyMax,
-            final Map<String ,Integer> argPropertySizeMap
-    ) throws NoSuchMethodException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException {
-        ApiTelegram telegram = BlancoRestAutotestUtil.createTelegramById(telegramId);
+            final Map<String ,Integer> argPropertySizeMap,
+            final List<String> argAssertKindList
+    ) throws NoSuchMethodException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException {
+        ApiTelegram telegram = BlancoRestAutotestUtil.createTelegramById(argTelegramId);
         if (telegram == null) {
-            throw new IllegalArgumentException("Cannot create telegram for " + telegramId);
+            throw new IllegalArgumentException("Cannot create telegram for " + argTelegramId);
         }
+
+        String jsonFilenamePrefix = BlancoRestAutotestUtil.jsonDataDir + "/" + argApiSimpleId + "-" + argMethodId;
 
         int propSize = 1;
         int readLine = 0;
@@ -1203,9 +1227,9 @@ public class BlancoRestAutotestXmlParser {
             int readLine0 = 0;
             String columnName = argPropertyTag + (index + 1);
             String propertyList = argPropertyMap.get(columnName);
+
             if (propertyList != null) {
                 String [] propTree = propertyList.split(Pattern.quote("."));
-                /* TODO readProperty を呼び出し、戻り値をtestCaseDataにはめ込んで次の in/outへ */
                 readLine0 = this.readProperty(
                         telegram,
                         propTree,
@@ -1217,6 +1241,8 @@ public class BlancoRestAutotestXmlParser {
                         index + 1,
                         argPropertyMap,
                         argPropertySizeMap,
+                        argAssertKindList,
+                        jsonFilenamePrefix,
                         false,
                         "", false);
                 readLine = Math.max(readLine, readLine0);
@@ -1235,6 +1261,7 @@ public class BlancoRestAutotestXmlParser {
     }
 
     /**
+     * Analysis property of Input/Expect sheet.
      *
      * @param argParentObj
      * @param argPropertyList
@@ -1247,7 +1274,7 @@ public class BlancoRestAutotestXmlParser {
      * @param argPropertyMap
      * @param argPropertySizeMap property のカラム番号を格納するmap
      * @param argNotSearchProp
-     * @param skipSetValue
+     * @param argSkipSetValue
      * @return このプロパティを読み取るために消費した行数
      * @throws InvocationTargetException
      * @throws NoSuchMethodException
@@ -1266,10 +1293,12 @@ public class BlancoRestAutotestXmlParser {
             final int argColumnNumber,
             final Map<String, String> argPropertyMap,
             final Map<String, Integer> argPropertySizeMap,
+            final List<String> argAssertKindList,
+            final String argJsonFilenamePrefix,
             final boolean argNotSearchProp,
-            final String indent,
-            final Boolean skipSetValue
-    ) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException {
+            final String argIndent,
+            final Boolean argSkipSetValue
+    ) throws InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException, NoSuchFieldException, IOException {
         if (argParentObj == null ||
                 argPropertyList == null ||
                 argFieldStructureList == null ||
@@ -1278,7 +1307,7 @@ public class BlancoRestAutotestXmlParser {
         ) {
             throw new IllegalArgumentException("引数が不正です。");
         }
-        if (argPropertyDepth > argPropertyList.length) {
+        if (argPropertyDepth >= argPropertyList.length) {
             throw new IllegalArgumentException("与えられたindexが配列よりも長すぎます。 depth = " + argPropertyDepth + ", length = " + argPropertyList.length);
         }
 
@@ -1292,8 +1321,8 @@ public class BlancoRestAutotestXmlParser {
         String propId = argPropertyList[argPropertyDepth];
 
         if (BlancoRestAutotestUtil.isVerbose) {
-            System.out.println(indent + "START readProperty : parentObj = " + argParentObj.getClass().getName() + ", columnId = " + columnId + ", propId = " + propId + ", caseLineStart = " + argCaseLineStart + ", argNotSearchProp = " + argNotSearchProp);
-            System.out.println(indent + "parentObj = " + argParentObj);
+            System.out.println(argIndent + "START readProperty : parentObj = " + argParentObj.getClass().getName() + ", columnId = " + columnId + ", propId = " + propId + ", caseLineStart = " + argCaseLineStart + ", argNotSearchProp = " + argNotSearchProp);
+            System.out.println(argIndent + "parentObj = " + argParentObj);
         }
 
         Boolean isTypeSpecified = false;
@@ -1323,8 +1352,20 @@ public class BlancoRestAutotestXmlParser {
         }
 
         if (BlancoRestAutotestUtil.isVerbose) {
-            System.out.println(indent + "readProperty : propObj = " + propObj.getClass().getName());
-            System.out.println(indent + "                         " + propObj);
+            System.out.println(argIndent + "readProperty : propObj = " + propObj.getClass().getName());
+            System.out.println(argIndent + "                         " + propObj);
+        }
+
+        Boolean isJsonMode = false;
+        if (argPropertyList.length == argPropertyDepth + 1) {
+            /* Check assertKind is JSON or NOT if this is leaf property. */
+            String assertKind = argAssertKindList.get(argColumnNumber - 1);
+            if (assertKind != null && assertKind.toLowerCase().startsWith("json")) {
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(argIndent + "### JSON assertion found : " + assertKind);
+                }
+                isJsonMode = true;
+            }
         }
 
         /*
@@ -1333,220 +1374,548 @@ public class BlancoRestAutotestXmlParser {
          * * Objectの場合はインスタンスを作成し、次のプロパティチェックに進む
          * * Arrayの場合はまずArrayListのインスタンスを作成し、次に総称型を取得し、次のプロパティチェックに進む
          */
+        if (isJsonMode) {
+
+            readLine = this.processJson(
+                    argParentObj,
+                    propObj,
+                    argPropertyDepth,
+                    argFieldStructureList,
+                    argCaseLineStart,
+                    argCaseLineMax,
+                    columnId,
+                    propId,
+                    argJsonFilenamePrefix,
+                    isTypeSpecified,
+                    typedPropId,
+                    argIndent
+            );
+        } else
         if (BlancoRestAutotestUtil.isPrimitiveObject(propObj)) {
-            BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart);
-            if (fieldStructure != null) {
-                String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, columnId);
-                if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(indent + "readProperty: primitive: " + value + " skip ? " + skipSetValue);
-                }
-                if (value != null) {
-                    /* ここで array の terminator チェック */
-                    if (value.startsWith("#")) {
-                        this.terminateArrayDepth = value.length();
-                        readLine = 0;
-                    } else {
-                        if (!skipSetValue) {
-                            BlancoRestAutotestUtil.setStringValue(argParentObj, propId, value);
-                        } else {
-                            if (BlancoRestAutotestUtil.isVerbose) {
-                                System.out.println(indent + "readProperty: primitive: SKIP TO SET VALUE.");
-                            }
-                        }
-                        readLine = 1;
-                    }
-                } else {
-                    readLine = 0;
-                }
-            }
+            readLine = this.processPrimitive(
+                    argParentObj,
+                    argFieldStructureList,
+                    argCaseLineStart,
+                    columnId,
+                    propId,
+                    argIndent,
+                    argSkipSetValue
+            );
         } else if (BlancoRestAutotestUtil.isArrayObject(propObj)) {
             /*
              * Array なので Generic を生成して次のプロパティチェックに進む。
              * なお、field 定義に Generic は明記されている前提である。
              */
-            /*
-             * この array の最終行の index を取得する
-             */
+
+            readLine = processArray(
+                    argParentObj,
+                    propObj,
+                    argPropertyList,
+                    argPropertyDepth,
+                    argFieldStructureList,
+                    argCaseLineStart,
+                    argCaseLineMax,
+                    columnId,
+                    propId,
+                    argColumnTag,
+                    argColumnNumber,
+                    argPropertyMap,
+                    argPropertySizeMap,
+                    argAssertKindList,
+                    argJsonFilenamePrefix,
+                    isTypeSpecified,
+                    typedPropId,
+                    argIndent
+            );
+
+        } else {
+            // Primitive でも Array でも無ければその他オブジェクトなので、次のプロパティチェックに進む
+
+            readLine = processObject(
+                    argParentObj,
+                    propObj,
+                    argPropertyList,
+                    argPropertyDepth,
+                    argFieldStructureList,
+                    argCaseLineStart,
+                    argCaseLineMax,
+                    propId,
+                    argColumnTag,
+                    argColumnNumber,
+                    argPropertyMap,
+                    argPropertySizeMap,
+                    argAssertKindList,
+                    argJsonFilenamePrefix,
+                    argIndent,
+                    argSkipSetValue
+            );
+
+        }
+
+        if (BlancoRestAutotestUtil.isVerbose) {
+            System.out.println(argIndent + "END readProperty : readLine = " + readLine);
+        }
+        return readLine;
+    }
+
+    /**
+     * Process on finding primitive type of property
+     *
+     * @param argParentObj
+     * @param argFieldStructureList
+     * @param argCaseLineStart
+     * @param argColumnId
+     * @param argPropId
+     * @param argIndent
+     * @param argSkipSetValue
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private int processPrimitive(
+            final Object argParentObj,
+            final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
+            final int argCaseLineStart,
+            final String argColumnId,
+            final String argPropId,
+            final String argIndent,
+            final Boolean argSkipSetValue
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        int readLine = 0;
+        BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart);
+        if (fieldStructure != null) {
+            String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "readProperty: primitive: " + value + " skip ? " + argSkipSetValue);
+            }
+            if (value != null) {
+                /* ここで array の terminator チェック */
+                if (value.startsWith("#")) {
+                    this.terminateArrayDepth = value.length();
+                    readLine = 0;
+                } else {
+                    if (!argSkipSetValue) {
+                        BlancoRestAutotestUtil.setStringValue(argParentObj, argPropId, value);
+                    } else {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "readProperty: primitive: SKIP TO SET VALUE.");
+                        }
+                    }
+                    readLine = 1;
+                }
+            } else {
+                readLine = 0;
+            }
+        }
+        return readLine;
+    }
+
+    /**
+     * Process on finding array type of property.
+     *
+     * @param argParentObj
+     * @param argPropObj
+     * @param argPropertyList
+     * @param argPropertyDepth
+     * @param argFieldStructureList
+     * @param argCaseLineStart
+     * @param argCaseLineMax
+     * @param argColumnId
+     * @param argPropId
+     * @param argColumnTag
+     * @param argColumnNumber
+     * @param argPropertyMap
+     * @param argPropertySizeMap
+     * @param isTypeSpecified
+     * @param typedPropId
+     * @param argIndent
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     * @throws NoSuchFieldException
+     * @throws InstantiationException
+     */
+    private int processArray(
+            final Object argParentObj,
+            final Object argPropObj,
+            final String[] argPropertyList,
+            final int argPropertyDepth,
+            final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
+            final int argCaseLineStart,
+            final int argCaseLineMax,
+            final String argColumnId,
+            final String argPropId,
+            final String argColumnTag,
+            final int argColumnNumber,
+            final Map<String, String> argPropertyMap,
+            final Map<String, Integer> argPropertySizeMap,
+            final List<String> argAssertKindList,
+            final String argApiSimpleId,
+            final Boolean isTypeSpecified,
+            final String [] typedPropId,
+            final String argIndent
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, NoSuchFieldException, InstantiationException, IOException {
+
+        int readLine = 0;
+
+        /*
+         * この array の最終行の index を取得する
+         */
+        int arrayEndIndex = this.getArrayLastIndex(
+                argFieldStructureList,
+                argColumnId,
+                argPropertyDepth,
+                argCaseLineStart,
+                argCaseLineMax
+        );
+
+        if (BlancoRestAutotestUtil.isVerbose) {
+            System.out.println(argIndent + "arrayEndIndex = " + arrayEndIndex);
+        }
+
+        /* Input/Expect 定義で配列先頭要素が [] の場合は空配列として扱う。 */
+        boolean isEmptyArray = this.isEmptyArray(argFieldStructureList, argColumnId, argCaseLineStart);
+        if (BlancoRestAutotestUtil.isVerbose) {
+            System.out.println(argIndent + "isEmptyArray = " + isEmptyArray);
+        }
+
+        int readLine0 = 0;
+        int arrayCount = 0;
+        for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
+            Object genericObj = null;
+            if (isTypeSpecified) {
+                String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
+                if (BlancoStringUtil.null2Blank(classId).length() == 0) {
+                    throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
+                }
+                genericObj = BlancoRestAutotestUtil.createObjectById(classId);
+            } else {
+                genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, argPropId);
+            }
+            if (genericObj == null) {
+                throw new IllegalArgumentException("Array には総称型の指定が必須です。");
+            }
+            if (arrayCount == 0) {
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(argIndent + "Generci = " + genericObj.getClass().getName());
+                    System.out.println(argIndent + "          " + genericObj);
+                }
+            }
+            boolean isPrimitiveGeneric = BlancoRestAutotestUtil.isPrimitiveObject(genericObj);
+            if (isPrimitiveGeneric) {
+                BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
+                if (fieldStructure != null) {
+                    String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
+                    if (value != null && value.startsWith("#")) {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "readProperty array: primitive: " + value + " is ignored");
+                        }
+                    } else if (!isEmptyArray) {
+                        BlancoRestAutotestUtil.addPrimitiveToList(argPropObj, value, genericObj.getClass().getName());
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "readProperty array: primitive: " + value + " is pushed to " + argPropObj.getClass().getName());
+                        }
+                    } else {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "readProperty array: primitive: " + value + " is ignored because of marked as empty array");
+                        }
+                    }
+                    readLine0 = 1;
+                    readLine++;
+                }
+            } else {
+                readLine0 = readProperty(
+                        genericObj,
+                        argPropertyList,
+                        argPropertyDepth,
+                        argFieldStructureList,
+                        argCaseLineStart + arrayCount,
+                        argCaseLineMax,
+                        argColumnTag,
+                        argColumnNumber,
+                        argPropertyMap,
+                        argPropertySizeMap,
+                        argAssertKindList,
+                        argApiSimpleId,
+                        true,
+                        argIndent + "  ",
+                        isEmptyArray);
+                if (readLine0 > 0) {
+                    BlancoRestAutotestUtil.addToList(argPropObj, genericObj);
+                    if (BlancoRestAutotestUtil.isVerbose) {
+                        System.out.println(argIndent + "generic = " + genericObj);
+                        System.out.println(argIndent + "readProperty array: " + genericObj.getClass().getName() + " is pushed to " + argPropObj.getClass().getName());
+                    }
+                    readLine += readLine0;
+                } else {
+                    readLine0 = 1;
+                    readLine++;
+                    break;
+                }
+            }
+        }
+//            readLine += 1; /* 配列のターミネータ分 */
+        if (isEmptyArray) {
+            BlancoRestAutotestUtil.setValue(argParentObj, argPropId, new ArrayList<>());
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "readProperty array: " + argPropObj.getClass().getName() + " is forced to be empty and set to " + argParentObj.getClass().getName() + " on " + argPropId);
+            }
+        } else if (((List)argPropObj).size() == 0) {
+            BlancoRestAutotestUtil.setValue(argParentObj, argPropId, null);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "readProperty array: " + argPropObj.getClass().getName() + " is empty, so set null to " + argParentObj.getClass().getName() + " on " + argPropId);
+            }
+        } else {
+            BlancoRestAutotestUtil.setValue(argParentObj, argPropId, argPropObj);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "readProperty array: " + argPropObj.getClass().getName() + " is set to " + argParentObj.getClass().getName() + " on " + argPropId);
+            }
+        }
+
+        return readLine;
+    }
+
+    /**
+     * Process on finding object type of property.
+     *
+     * @param argParentObj
+     * @param argPropObj
+     * @param argPropertyList
+     * @param argPropertyDepth
+     * @param argFieldStructureList
+     * @param argCaseLineStart
+     * @param argCaseLineMax
+     * @param argPropId
+     * @param argColumnTag
+     * @param argColumnNumber
+     * @param argPropertyMap
+     * @param argPropertySizeMap
+     * @param argIndent
+     * @param argSkipSetValue
+     * @return
+     * @throws NoSuchMethodException
+     * @throws NoSuchFieldException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private int processObject(
+            final Object argParentObj,
+            final Object argPropObj,
+            final String[] argPropertyList,
+            final int argPropertyDepth,
+            final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
+            final int argCaseLineStart,
+            final int argCaseLineMax,
+            final String argPropId,
+            final String argColumnTag,
+            final int argColumnNumber,
+            final Map<String, String> argPropertyMap,
+            final Map<String, Integer> argPropertySizeMap,
+            final List<String> argAssertKindList,
+            final String argApiSimpleId,
+            final String argIndent,
+            final Boolean argSkipSetValue
+    ) throws NoSuchMethodException, NoSuchFieldException, InstantiationException, IllegalAccessException, InvocationTargetException, IOException {
+        int readLine = 0;
+
+        /* このプロパティの幅を取得する */
+        String propKey = "";
+        for (int i = 0; i < argPropertyDepth + 1; i++) {
+            propKey = propKey.length() > 0 ? propKey + "." + argPropertyList[i] : argPropertyList[i];
+        }
+        int readLine0 = 0;
+        boolean hasValue = false;
+        int propSize = 0;
+        int propertyMax = argPropertySizeMap.get(propKey);
+        if (BlancoRestAutotestUtil.isVerbose) {
+            System.out.println(argIndent + "### readProperty object: propKey = " + propKey + ", propMax = " + propertyMax + ", propObj = " + argPropObj.getClass().getName());
+        }
+        for (int index = argColumnNumber; index < argColumnNumber + propertyMax; index += propSize) {
+            String columnName = argColumnTag + index;
+            String propertyList = argPropertyMap.get(columnName);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "readProperty object: columnName = " + columnName + ", propertyList = " + propertyList+ " (" + index + "), depth = " + argPropertyDepth + ", propObj = " + argPropObj.getClass().getName());
+            }
+            if (propertyList == null) {
+                throw new IllegalArgumentException("No such column exists: " + columnName);
+            }
+            String[] propTree = propertyList.split(Pattern.quote("."));
+
+            readLine0 = readProperty(
+                    argPropObj,
+                    propTree,
+                    argPropertyDepth + 1,
+                    argFieldStructureList,
+                    argCaseLineStart,
+                    argCaseLineMax,
+                    argColumnTag,
+                    index,
+                    argPropertyMap,
+                    argPropertySizeMap,
+                    argAssertKindList,
+                    argApiSimpleId,
+                    false,
+                    argIndent + "  ",
+                    argSkipSetValue);
+            if (readLine0 > 0) {
+                hasValue = true;
+                readLine = Math.max(readLine, readLine0);
+            }
+            /* 次のプロパティで処理されたであろう幅を取得する */
+            propSize = 1;
+            if (argPropertyDepth + 1 < propTree.length) {
+                String nextPropKey = "";
+                for (int i = 0; i <= argPropertyDepth + 1; i++) {
+                    nextPropKey = nextPropKey.length() > 0 ? nextPropKey + "." + propTree[i] : propTree[i];
+                }
+                propSize = argPropertySizeMap.get(nextPropKey);
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(argIndent + "readProperty object : propSize = " + propSize + " for " + nextPropKey);
+                }
+            }
+        }
+        if (hasValue) {
+            if (!argParentObj.getClass().getName().equals(argPropObj.getClass().getName())) {
+                /* Array から Generic で呼び出された場合は argParentObj と propObj が同じになっている */
+                BlancoRestAutotestUtil.setValue(argParentObj, argPropId, argPropObj);
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(argIndent + "readProperty object: " + argPropObj.getClass().getName() + " is set to " + argParentObj.getClass().getName());
+                }
+            }
+        } else {
+            readLine = 0;
+        }
+
+        return readLine;
+    }
+
+    private int processJson(
+            final Object argParentObj,
+            final Object argPropObj,
+            final int argPropertyDepth,
+            final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
+            final int argCaseLineStart,
+            final int argCaseLineMax,
+            final String argColumnId,
+            final String argPropId,
+            final String argJsonFilenamePrefix,
+            final Boolean isTypeSpecified,
+            final String [] typedPropId,
+            final String argIndent
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException, NoSuchFieldException {
+        int readLine = 0;
+
+        if (BlancoRestAutotestUtil.isArrayObject(argPropObj)) {
+            /* for JSON array. */
+
+            /* Get last index of this array */
             int arrayEndIndex = this.getArrayLastIndex(
                     argFieldStructureList,
-                    columnId,
+                    argColumnId,
                     argPropertyDepth,
                     argCaseLineStart,
                     argCaseLineMax
             );
 
             if (BlancoRestAutotestUtil.isVerbose) {
-                System.out.println(indent + "arrayEndIndex = " + arrayEndIndex);
+                System.out.println(argIndent + "processJson arrayEndIndex = " + arrayEndIndex);
             }
 
-            /* Input/Expect 定義で配列先頭要素が [] の場合は空配列として扱う。 */
-            boolean isEmptyArray = this.isEmptyArray(argFieldStructureList, columnId, argCaseLineStart);
+            Object genericObj = null;
+            if (isTypeSpecified) {
+                String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
+                if (BlancoStringUtil.null2Blank(classId).length() == 0) {
+                    throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
+                }
+                genericObj = BlancoRestAutotestUtil.createObjectById(classId);
+            } else {
+                genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, argPropId);
+            }
+            if (genericObj == null) {
+                throw new IllegalArgumentException("Array には総称型の指定が必須です。");
+            }
             if (BlancoRestAutotestUtil.isVerbose) {
-                System.out.println(indent + "isEmptyArray = " + isEmptyArray);
+                System.out.println(argIndent + "processJson Generci = " + genericObj.getClass().getName());
+                System.out.println(argIndent + "processJson           " + genericObj);
             }
 
-            int readLine0 = 0;
             int arrayCount = 0;
-            for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
-                Object genericObj = null;
-                if (isTypeSpecified) {
-                    String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
-                    if (BlancoStringUtil.null2Blank(classId).length() == 0) {
-                        throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
-                    }
-                    genericObj = BlancoRestAutotestUtil.createObjectById(classId);
-                } else {
-                    genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, propId);
-                }
-                if (genericObj == null) {
-                    throw new IllegalArgumentException("Array には総称型の指定が必須です。");
-                }
-                if (arrayCount == 0) {
-                    if (BlancoRestAutotestUtil.isVerbose) {
-                        System.out.println(indent + "Generci = " + genericObj.getClass().getName());
-                        System.out.println(indent + "          " + genericObj);
-                    }
-                }
-                boolean isPrimitiveGeneric = BlancoRestAutotestUtil.isPrimitiveObject(genericObj);
-                if (isPrimitiveGeneric) {
-                    BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
-                    if (fieldStructure != null) {
-                        String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, columnId);
-                        if (value != null && value.startsWith("#")) {
-                            if (BlancoRestAutotestUtil.isVerbose) {
-                                System.out.println(indent + "readProperty array: primitive: " + value + " is ignored");
-                            }
-                        } else if (!isEmptyArray) {
-                            BlancoRestAutotestUtil.addPrimitiveToList(propObj, value, genericObj.getClass().getName());
-                            if (BlancoRestAutotestUtil.isVerbose) {
-                                System.out.println(indent + "readProperty array: primitive: " + value + " is pushed to " + propObj.getClass().getName());
-                            }
-                        } else {
-                            if (BlancoRestAutotestUtil.isVerbose) {
-                                System.out.println(indent + "readProperty array: primitive: " + value + " is ignored because of marked as empty array");
-                            }
-                        }
-                        readLine0 = 1;
-                        readLine++;
-                    }
-                } else {
-                    readLine0 = readProperty(
-                            genericObj,
-                            argPropertyList,
-                            argPropertyDepth,
-                            argFieldStructureList,
-                            argCaseLineStart + arrayCount,
-                            argCaseLineMax,
-                            argColumnTag,
-                            argColumnNumber,
-                            argPropertyMap,
-                            argPropertySizeMap,
-                            true,
-                            indent + "  ",
-                            isEmptyArray);
-                    if (readLine0 > 0) {
-                        BlancoRestAutotestUtil.addToList(propObj, genericObj);
+            for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount++) {
+                BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
+                if (fieldStructure != null) {
+                    String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
+                    if (value != null && value.startsWith("#")) {
                         if (BlancoRestAutotestUtil.isVerbose) {
-                            System.out.println(indent + "generic = " + genericObj);
-                            System.out.println(indent + "readProperty array: " + genericObj.getClass().getName() + " is pushed to " + propObj.getClass().getName());
+                            System.out.println(argIndent + "processJson readProperty array: " + value + " found. end of array.");
                         }
-                        readLine += readLine0;
-                    } else {
-                        readLine0 = 1;
-                        readLine++;
                         break;
                     }
                 }
+
+                Object obj = generateObjectFromJson(
+                        genericObj,
+                        fieldStructure,
+                        argColumnId,
+                        argJsonFilenamePrefix,
+                        argIndent
+                );
+                if (obj == null) {
+                    throw new IllegalArgumentException("processJson: NULL!!!");
+                }
+                BlancoRestAutotestUtil.addToList(argPropObj, obj);
+                if (BlancoRestAutotestUtil.isVerbose) {
+                    System.out.println(argIndent + "processJson : " + obj.getClass().getName() + " is pushed to " + argPropId);
+                }
+                readLine++;
             }
-//            readLine += 1; /* 配列のターミネータ分 */
-            if (isEmptyArray) {
-                BlancoRestAutotestUtil.setValue(argParentObj, propId, new ArrayList<>());
+            if (readLine > 0) {
+                BlancoRestAutotestUtil.setValue(argParentObj, argPropId, argPropObj);
                 if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is forced to be empty and set to " + argParentObj.getClass().getName() + " on " + propId);
-                }
-            } else if (((List)propObj).size() == 0) {
-                BlancoRestAutotestUtil.setValue(argParentObj, propId, null);
-                if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is empty, so set null to " + argParentObj.getClass().getName() + " on " + propId);
-                }
-            } else {
-                BlancoRestAutotestUtil.setValue(argParentObj, propId, propObj);
-                if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(indent + "readProperty array: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName() + " on " + propId);
+                    System.out.println(argIndent + "processJson : " + argPropObj.getClass().getName() + " is set to " + argPropId + "(" + argParentObj.getClass().getName() + ")");
                 }
             }
         } else {
-            // Primitive でも Array でも無ければその他オブジェクトなので、次のプロパティチェックに進む
-            /* このプロパティの幅を取得する */
-            String propKey = "";
-            for (int i = 0; i < argPropertyDepth + 1; i++) {
-                propKey = propKey.length() > 0 ? propKey + "." + argPropertyList[i] : argPropertyList[i];
-            }
-            int readLine0 = 0;
-            boolean hasValue = false;
-            int propSize = 0;
-            int propertyMax = argPropertySizeMap.get(propKey);
-            if (BlancoRestAutotestUtil.isVerbose) {
-                System.out.println(indent + "### readProperty object: propKey = " + propKey + ", propMax = " + propertyMax + ", propObj = " + propObj.getClass().getName());
-            }
-            for (int index = argColumnNumber; index < argColumnNumber + propertyMax; index += propSize) {
-                String columnName = argColumnTag + index;
-                String propertyList = argPropertyMap.get(columnName);
+            /* Get one record and build JSON filename from the value. */
+            BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart);
+            Object obj = generateObjectFromJson(
+                    argPropObj,
+                    fieldStructure,
+                    argColumnId,
+                    argJsonFilenamePrefix,
+                    argIndent
+            );
+            if (obj != null) {
+                BlancoRestAutotestUtil.setValue(argParentObj, argPropId, obj);
                 if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(indent + "readProperty object: columnName = " + columnName + ", propertyList = " + propertyList+ " (" + index + "), depth = " + argPropertyDepth + ", propObj = " + propObj.getClass().getName());
+                    System.out.println(argIndent + "processJson : " + obj.getClass().getName() + " is set to " + argPropId + "(" + argParentObj.getClass().getName() + ")");
                 }
-                if (propertyList == null) {
-                    throw new IllegalAccessException("No such column exists: " + columnName);
-                }
-                String[] propTree = propertyList.split(Pattern.quote("."));
-
-                readLine0 = readProperty(
-                        propObj,
-                        propTree,
-                        argPropertyDepth + 1,
-                        argFieldStructureList,
-                        argCaseLineStart,
-                        argCaseLineMax,
-                        argColumnTag,
-                        index,
-                        argPropertyMap,
-                        argPropertySizeMap,
-                        false,
-                        indent + "  ",
-                        skipSetValue);
-                if (readLine0 > 0) {
-                    hasValue = true;
-                    readLine = Math.max(readLine, readLine0);
-                }
-                /* 次のプロパティで処理されたであろう幅を取得する */
-                propSize = 1;
-                if (argPropertyDepth + 1 < propTree.length) {
-                    String nextPropKey = "";
-                    for (int i = 0; i <= argPropertyDepth + 1; i++) {
-                        nextPropKey = nextPropKey.length() > 0 ? nextPropKey + "." + propTree[i] : propTree[i];
-                    }
-                    propSize = argPropertySizeMap.get(nextPropKey);
-                    if (BlancoRestAutotestUtil.isVerbose) {
-                        System.out.println(indent + "readProperty object : propSize = " + propSize + " for " + nextPropKey);
-                    }
-                }
+                readLine = 1;
             }
-            if (hasValue) {
-                if (!argParentObj.getClass().getName().equals(propObj.getClass().getName())) {
-                    /* Array から Generic で呼び出された場合は argParentObj と propObj が同じになっている */
-                    BlancoRestAutotestUtil.setValue(argParentObj, propId, propObj);
-                    if (BlancoRestAutotestUtil.isVerbose) {
-                        System.out.println(indent + "readProperty object: " + propObj.getClass().getName() + " is set to " + argParentObj.getClass().getName());
-                    }
-                }
-            } else {
-                readLine = 0;
-            }
-        }
-
-        if (BlancoRestAutotestUtil.isVerbose) {
-            System.out.println(indent + "END readProperty : readLine = " + readLine);
         }
         return readLine;
+    }
+
+    private Object generateObjectFromJson(
+            final Object argPropObj,
+            final BlancoRestAutotestInputResultFieldStructure fieldStructure,
+            final String argColumnId,
+            final String argJsonFilenamePrefix,
+            final String argIndent
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException {
+        Object obj = null;
+        if (fieldStructure != null) {
+            String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "processJson: file suffix: " + value);
+            }
+            if (value != null) {
+                String filename = argJsonFilenamePrefix + "/" + value + ".json";
+                obj = BlancoRestAutotestUtil.convertJsonToObject(filename, argPropObj);
+            }
+        }
+        return obj;
     }
 }

@@ -16,9 +16,9 @@ import blanco.xml.bind.BlancoXmlBindingUtil;
 import blanco.xml.bind.BlancoXmlUnmarshaller;
 import blanco.xml.bind.valueobject.BlancoXmlDocument;
 import blanco.xml.bind.valueobject.BlancoXmlElement;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -34,6 +34,8 @@ public class BlancoRestAutotestUtil {
     public static boolean isVerbose = false;
     /** 電文情報をJSONファイルとして出力します */
     public static boolean isOutputJson = false;
+    /** Input / Expect シートで JSON データが指定された場合の、JSON ファイルの配置場所です。 */
+    public static String jsonDataDir = "src/test/resources/json";
 
     /** 現在処理中の InputResult シートの Input 欄の数 */
     public static int inputColumnMax = BlancoRestAutotestConstants.INPUT_MAX;
@@ -685,5 +687,30 @@ public class BlancoRestAutotestUtil {
             simpleName = argClassNameCanon.substring(0, findLastDot);
         }
         return simpleName;
+    }
+
+    public static String readJsonFile(String filename) throws IOException {
+        File jsonFile = new File(filename);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile)));
+
+        StringBuffer sb = new StringBuffer();
+        for (String line = reader.readLine();
+             line != null;
+             line = reader.readLine()) {
+            sb.append(line);
+        }
+        reader.close();
+
+        return sb.toString();
+    }
+
+    public static Object convertJsonToObject(String filename, Object mapTo) throws IOException {
+        String json = readJsonFile(filename);
+//        if (BlancoRestAutotestUtil.isVerbose) {
+//            System.out.println("convertJsonToObject : json = " + json);
+//        }
+        /* try with default deserializer. */
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(json, mapTo.getClass());
     }
 }

@@ -73,6 +73,8 @@ public class BlancoRestAutotestBatchProcess {
                 input.setOutputJson(Boolean.valueOf(arg.substring(12)).booleanValue());
             } else if (arg.startsWith("-searchTmpdir=")) {
                 input.setSearchTmpdir(arg.substring(14));
+            } else if (arg.startsWith("-jsonDataDir=")) {
+                input.setJsonDataDir(arg.substring(13));
             } else if (arg.equals("-?") || arg.equals("-help")) {
                 usage();
                 System.exit(END_SUCCESS);
@@ -166,7 +168,7 @@ public class BlancoRestAutotestBatchProcess {
      */
     public static final void usage() {
         System.out.println("BlancoRestAutotestBatchProcess: Usage:");
-        System.out.println("  java blanco.restautotest.task.BlancoRestAutotestBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -encoding=値5 -xmlrootelement=値6 -sheetType=値7 -lineSeparator=値8 -targetStyle=値9 -outputJson=値10 -searchTmpdir=値11");
+        System.out.println("  java blanco.restautotest.task.BlancoRestAutotestBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -encoding=値5 -xmlrootelement=値6 -sheetType=値7 -lineSeparator=値8 -targetStyle=値9 -outputJson=値10 -searchTmpdir=値11 -jsonDataDir=値12");
         System.out.println("    -verbose");
         System.out.println("      説明[verboseモードで動作させるかどうか。]");
         System.out.println("      型[真偽]");
@@ -209,6 +211,10 @@ public class BlancoRestAutotestBatchProcess {
         System.out.println("    -searchTmpdir");
         System.out.println("      説明[import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。]");
         System.out.println("      型[文字列]");
+        System.out.println("    -jsonDataDir");
+        System.out.println("      説明[Input / Expect データとして読み込むJSONファイルを配置する場所です。]");
+        System.out.println("      型[文字列]");
+        System.out.println("      デフォルト値[src/test/resources/json]");
         System.out.println("    -? , -help");
         System.out.println("      説明[使い方を表示します。]");
     }

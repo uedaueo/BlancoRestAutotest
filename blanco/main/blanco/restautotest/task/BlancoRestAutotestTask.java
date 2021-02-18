@@ -79,6 +79,11 @@ public class BlancoRestAutotestTask extends Task {
     protected boolean fIsFieldSearchTmpdirProcessed = false;
 
     /**
+     * フィールド [jsonDataDir] に値がセットされたかどうか。
+     */
+    protected boolean fIsFieldJsonDataDirProcessed = false;
+
+    /**
      * verboseモードで動作させるかどうか。
      *
      * @param arg verboseモードで動作させるかどうか。
@@ -355,6 +360,32 @@ public class BlancoRestAutotestTask extends Task {
     }
 
     /**
+     * Antタスクの[jsonDataDir]アトリビュートのセッターメソッド。
+     *
+     * 項目番号: 11<br>
+     * Input / Expect データとして読み込むJSONファイルを配置する場所です。<br>
+     *
+     * @param arg セットしたい値
+     */
+    public void setJsonDataDir(final String arg) {
+        fInput.setJsonDataDir(arg);
+        fIsFieldJsonDataDirProcessed = true;
+    }
+
+    /**
+     * Antタスクの[jsonDataDir]アトリビュートのゲッターメソッド。
+     *
+     * 項目番号: 11<br>
+     * Input / Expect データとして読み込むJSONファイルを配置する場所です。<br>
+     * デフォルト値[src/test/resources/json]が設定されています。Apache Antタスク上でアトリビュートの指定が無い場合には、デフォルト値が設定されます。<br>
+     *
+     * @return このフィールドの値
+     */
+    public String getJsonDataDir() {
+        return fInput.getJsonDataDir();
+    }
+
+    /**
      * Antタスクのメイン処理。Apache Antから このメソッドが呼び出されます。
      *
      * @throws BuildException タスクとしての例外が発生した場合。
@@ -380,6 +411,7 @@ public class BlancoRestAutotestTask extends Task {
             System.out.println("- targetStyle:[" + getTargetStyle() + "]");
             System.out.println("- outputJson:[" + getOutputJson() + "]");
             System.out.println("- searchTmpdir:[" + getSearchTmpdir() + "]");
+            System.out.println("- jsonDataDir:[" + getJsonDataDir() + "]");
         }
 
         try {

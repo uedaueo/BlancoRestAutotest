@@ -121,6 +121,7 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
 
             BlancoRestAutotestUtil.isVerbose = input.getVerbose();
             BlancoRestAutotestUtil.isOutputJson = input.getOutputJson();
+            BlancoRestAutotestUtil.jsonDataDir = input.getJsonDataDir();
 
             List<BlancoRestAutotestTestCaseData> allTestCaseDataList = new ArrayList<>();
             for (int index = 0; index < fileMeta2.length; index++) {

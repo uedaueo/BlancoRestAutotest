@@ -90,6 +90,14 @@ public class BlancoRestAutotestProcessInput {
     private String fSearchTmpdir;
 
     /**
+     * Input / Expect データとして読み込むJSONファイルを配置する場所です。
+     *
+     * フィールド: [jsonDataDir]。
+     * デフォルト: [src/test/resources/json]。
+     */
+    private String fJsonDataDir = "src/test/resources/json";
+
+    /**
      * フィールド [verbose] の値を設定します。
      *
      * フィールドの説明: [verboseモードで動作させるかどうか。]。
@@ -340,6 +348,29 @@ public class BlancoRestAutotestProcessInput {
     }
 
     /**
+     * フィールド [jsonDataDir] の値を設定します。
+     *
+     * フィールドの説明: [Input / Expect データとして読み込むJSONファイルを配置する場所です。]。
+     *
+     * @param argJsonDataDir フィールド[jsonDataDir]に設定する値。
+     */
+    public void setJsonDataDir(final String argJsonDataDir) {
+        fJsonDataDir = argJsonDataDir;
+    }
+
+    /**
+     * フィールド [jsonDataDir] の値を取得します。
+     *
+     * フィールドの説明: [Input / Expect データとして読み込むJSONファイルを配置する場所です。]。
+     * デフォルト: [src/test/resources/json]。
+     *
+     * @return フィールド[jsonDataDir]から取得した値。
+     */
+    public String getJsonDataDir() {
+        return fJsonDataDir;
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * <P>使用上の注意</P>
@@ -365,6 +396,7 @@ public class BlancoRestAutotestProcessInput {
         buf.append(",targetStyle=" + fTargetStyle);
         buf.append(",outputJson=" + fOutputJson);
         buf.append(",searchTmpdir=" + fSearchTmpdir);
+        buf.append(",jsonDataDir=" + fJsonDataDir);
         buf.append("]");
         return buf.toString();
     }
@@ -420,5 +452,8 @@ public class BlancoRestAutotestProcessInput {
         // Name: fSearchTmpdir
         // Type: java.lang.String
         target.fSearchTmpdir = this.fSearchTmpdir;
+        // Name: fJsonDataDir
+        // Type: java.lang.String
+        target.fJsonDataDir = this.fJsonDataDir;
     }
 }

@@ -18,6 +18,13 @@ public class GetTableSample5PostRequest extends ApiPostTelegram {
     private ApiTelegram fId;
 
     /**
+     * フィールド [jsonData]
+     *
+     * 項目の型 [blanco.sample.TableSampleOption]
+     */
+    private TableSampleOption fJsonData;
+
+    /**
      * フィールド [id]のセッターメソッド
      *
      * 項目の型 [blanco.restgenerator.valueobject.ApiTelegram]
@@ -51,6 +58,39 @@ public class GetTableSample5PostRequest extends ApiPostTelegram {
     }
 
     /**
+     * フィールド [jsonData]のセッターメソッド
+     *
+     * 項目の型 [blanco.sample.TableSampleOption]
+     *
+     * @param argJsonData フィールド[jsonData]に格納したい値
+     */
+    public void setJsonData(final TableSampleOption argJsonData) {
+        this.fJsonData = argJsonData;
+    }
+
+    /**
+     * フィールド[jsonData]のゲッターメソッド
+     *
+     * 項目の型 [blanco.sample.TableSampleOption]
+     *
+     * @return フィールド[jsonData]に格納されている値
+     */
+    public TableSampleOption getJsonData() {
+        return this.fJsonData;
+    }
+
+    /**
+     * フィールド[jsonData]のゲッターメソッド
+     *
+     * 項目の型 [java.lang.String]
+     *
+     * @return フィールド[jsonData]の型名文字列
+     */
+    public static String typeJsonData() {
+        return "blanco.sample.TableSampleOption";
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * オブジェクトのシャロー範囲でしかtoStringされない点に注意して利用してください。
@@ -62,6 +102,7 @@ public class GetTableSample5PostRequest extends ApiPostTelegram {
         java.lang.String buf = "";
         buf = buf + "blanco.sample.GetTableSample5PostRequest[";
         buf = buf + "id=" +  this.fId;
+        buf = buf + ",jsonData=" +  this.fJsonData;
         buf = buf + "]";
         return buf;
     }

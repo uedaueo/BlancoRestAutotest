@@ -89,11 +89,11 @@ public class BlancoRestAutotestTestCaseData {
     private Map<String, Integer> fPropertySizeMap;
 
     /**
-     * Expect? のカラムごとの比較方法を保持します。
+     * Input?/Expect? のカラムごとの比較方法を保持します。
      *
-     * フィールド: [assertKindList]。
+     * フィールド: [assertKindListMap]。
      */
-    private List<String> fAssertKindList;
+    private Map<String, List<String>> fAssertKindListMap;
 
     /**
      * 対象APIの電文処理IDの短縮名を格納します。
@@ -354,25 +354,25 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
-     * フィールド [assertKindList] の値を設定します。
+     * フィールド [assertKindListMap] の値を設定します。
      *
-     * フィールドの説明: [Expect? のカラムごとの比較方法を保持します。]。
+     * フィールドの説明: [Input?/Expect? のカラムごとの比較方法を保持します。]。
      *
-     * @param argAssertKindList フィールド[assertKindList]に設定する値。
+     * @param argAssertKindListMap フィールド[assertKindListMap]に設定する値。
      */
-    public void setAssertKindList(final List<String> argAssertKindList) {
-        fAssertKindList = argAssertKindList;
+    public void setAssertKindListMap(final Map<String, List<String>> argAssertKindListMap) {
+        fAssertKindListMap = argAssertKindListMap;
     }
 
     /**
-     * フィールド [assertKindList] の値を取得します。
+     * フィールド [assertKindListMap] の値を取得します。
      *
-     * フィールドの説明: [Expect? のカラムごとの比較方法を保持します。]。
+     * フィールドの説明: [Input?/Expect? のカラムごとの比較方法を保持します。]。
      *
-     * @return フィールド[assertKindList]から取得した値。
+     * @return フィールド[assertKindListMap]から取得した値。
      */
-    public List<String> getAssertKindList() {
-        return fAssertKindList;
+    public Map<String, List<String>> getAssertKindListMap() {
+        return fAssertKindListMap;
     }
 
     /**
@@ -445,7 +445,7 @@ public class BlancoRestAutotestTestCaseData {
         buf.append(",expectedColumnMax=" + fExpectedColumnMax);
         buf.append(",propertyMap=" + fPropertyMap);
         buf.append(",propertySizeMap=" + fPropertySizeMap);
-        buf.append(",assertKindList=" + fAssertKindList);
+        buf.append(",assertKindListMap=" + fAssertKindListMap);
         buf.append(",targetApiSimpleId=" + fTargetApiSimpleId);
         buf.append(",method=" + fMethod);
         buf.append("]");
@@ -503,9 +503,9 @@ public class BlancoRestAutotestTestCaseData {
         // Name: fPropertySizeMap
         // Type: java.util.Map
         // フィールド[fPropertySizeMap]はサポート外の型[java.util.MapString, Integer]です。
-        // Name: fAssertKindList
-        // Type: java.util.List
-        // フィールド[fAssertKindList]はサポート外の型[java.util.ListString]です。
+        // Name: fAssertKindListMap
+        // Type: java.util.Map
+        // フィールド[fAssertKindListMap]はサポート外の型[java.util.Mapjava.lang.String, java.util.List<String>]です。
         // Name: fTargetApiSimpleId
         // Type: java.lang.String
         target.fTargetApiSimpleId = this.fTargetApiSimpleId;

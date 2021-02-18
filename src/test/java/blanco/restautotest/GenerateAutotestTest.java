@@ -21,6 +21,7 @@ public class GenerateAutotestTest {
         input.setVerbose(true);
         input.setOutputJson(true);
         input.setLineSeparator("LF");
+        input.setJsonDataDir("src/test/resources/json");
 
         BlancoRestAutotestProcessImpl imple = new BlancoRestAutotestProcessImpl();
         try {

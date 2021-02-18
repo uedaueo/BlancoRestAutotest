@@ -37,6 +37,14 @@ public class GetTableSample5PostResponse extends ApiPostTelegram {
     private String fMemo;
 
     /**
+     * フィールド [jsonContainer]
+     *
+     * 項目の型 [blanco.sample.JsonContainer]
+     * JSONデータコンテナ
+     */
+    private JsonContainer fJsonContainer;
+
+    /**
      * フィールド [telegram1]のセッターメソッド
      *
      * 項目の型 [blanco.restgenerator.valueobject.ApiTelegram]
@@ -145,6 +153,42 @@ public class GetTableSample5PostResponse extends ApiPostTelegram {
     }
 
     /**
+     * フィールド [jsonContainer]のセッターメソッド
+     *
+     * 項目の型 [blanco.sample.JsonContainer]
+     * JSONデータコンテナ
+     *
+     * @param argJsonContainer フィールド[jsonContainer]に格納したい値
+     */
+    public void setJsonContainer(final JsonContainer argJsonContainer) {
+        this.fJsonContainer = argJsonContainer;
+    }
+
+    /**
+     * フィールド[jsonContainer]のゲッターメソッド
+     *
+     * 項目の型 [blanco.sample.JsonContainer]
+     * JSONデータコンテナ
+     *
+     * @return フィールド[jsonContainer]に格納されている値
+     */
+    public JsonContainer getJsonContainer() {
+        return this.fJsonContainer;
+    }
+
+    /**
+     * フィールド[jsonContainer]のゲッターメソッド
+     *
+     * 項目の型 [java.lang.String]
+     * JSONデータコンテナ
+     *
+     * @return フィールド[jsonContainer]の型名文字列
+     */
+    public static String typeJsonContainer() {
+        return "blanco.sample.JsonContainer";
+    }
+
+    /**
      * このバリューオブジェクトの文字列表現を取得します。
      *
      * オブジェクトのシャロー範囲でしかtoStringされない点に注意して利用してください。
@@ -158,6 +202,7 @@ public class GetTableSample5PostResponse extends ApiPostTelegram {
         buf = buf + "telegram1=" +  this.fTelegram1;
         buf = buf + ",telegram2=" +  this.fTelegram2;
         buf = buf + ",memo=" + this.fMemo;
+        buf = buf + ",jsonContainer=" +  this.fJsonContainer;
         buf = buf + "]";
         return buf;
     }
