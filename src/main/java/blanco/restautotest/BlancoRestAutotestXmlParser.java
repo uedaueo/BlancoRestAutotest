@@ -1824,6 +1824,12 @@ public class BlancoRestAutotestXmlParser {
                 System.out.println(argIndent + "processJson arrayEndIndex = " + arrayEndIndex);
             }
 
+            /* Input/Expect 定義で配列先頭要素が [] の場合は空配列として扱う。 */
+            boolean isEmptyArray = this.isEmptyArray(argFieldStructureList, argColumnId, argCaseLineStart);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "isEmptyArray = " + isEmptyArray);
+            }
+
             Object genericObj = null;
             if (isTypeSpecified) {
                 String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
@@ -1852,22 +1858,26 @@ public class BlancoRestAutotestXmlParser {
                             System.out.println(argIndent + "processJson readProperty array: " + value + " found. end of array.");
                         }
                         break;
+                    }  else if (!isEmptyArray) {
+                        Object obj = generateObjectFromJson(
+                                genericObj,
+                                fieldStructure,
+                                argColumnId,
+                                argJsonFilenamePrefix,
+                                argIndent
+                        );
+                        if (obj == null) {
+                            throw new IllegalArgumentException("processJson: NULL!!!");
+                        }
+                        BlancoRestAutotestUtil.addToList(argPropObj, obj);
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "processJson : " + obj.getClass().getName() + " is pushed to " + argPropId);
+                        }
+                    } else {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "processJson array: primitive: " + value + " is ignored because of marked as empty array");
+                        }
                     }
-                }
-
-                Object obj = generateObjectFromJson(
-                        genericObj,
-                        fieldStructure,
-                        argColumnId,
-                        argJsonFilenamePrefix,
-                        argIndent
-                );
-                if (obj == null) {
-                    throw new IllegalArgumentException("processJson: NULL!!!");
-                }
-                BlancoRestAutotestUtil.addToList(argPropObj, obj);
-                if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(argIndent + "processJson : " + obj.getClass().getName() + " is pushed to " + argPropId);
                 }
                 readLine++;
             }
