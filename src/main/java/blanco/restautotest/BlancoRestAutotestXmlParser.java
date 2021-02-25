@@ -1357,6 +1357,7 @@ public class BlancoRestAutotestXmlParser {
         }
 
         Boolean isJsonMode = false;
+        Boolean isJsonArrayMode = false;
         if (argPropertyList.length == argPropertyDepth + 1) {
             /* Check assertKind is JSON or NOT if this is leaf property. */
             String assertKind = argAssertKindList.get(argColumnNumber - 1);
@@ -1365,6 +1366,9 @@ public class BlancoRestAutotestXmlParser {
                     System.out.println(argIndent + "### JSON assertion found : " + assertKind);
                 }
                 isJsonMode = true;
+            } else if (assertKind != null && assertKind.toLowerCase().startsWith("arrayofjson")) {
+                isJsonMode = true;
+                isJsonArrayMode = true;
             }
         }
 
@@ -1388,6 +1392,7 @@ public class BlancoRestAutotestXmlParser {
                     argJsonFilenamePrefix,
                     isTypeSpecified,
                     typedPropId,
+                    isJsonArrayMode,
                     argIndent
             );
         } else
@@ -1804,11 +1809,12 @@ public class BlancoRestAutotestXmlParser {
             final String argJsonFilenamePrefix,
             final Boolean isTypeSpecified,
             final String [] typedPropId,
+            final Boolean isJsonArrayMode,
             final String argIndent
     ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, IOException, NoSuchFieldException {
         int readLine = 0;
 
-        if (BlancoRestAutotestUtil.isArrayObject(argPropObj)) {
+        if (BlancoRestAutotestUtil.isArrayObject(argPropObj) && !isJsonArrayMode) {
             /* for JSON array. */
 
             /* Get last index of this array */

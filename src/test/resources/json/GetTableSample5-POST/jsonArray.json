@@ -1,0 +1,38 @@
+[
+  {
+    "item": "itemArray01",
+    "quantity": 100,
+    "option3": [
+      {
+        "foo": ["foo01", "foo02", "foo03"],
+        "bar": ["bar01", "bar02", "bar03"]
+      },
+      {
+        "foo": ["foo11", "foo02", "foo03"],
+        "bar": ["bar11", "bar02", "bar03"]
+      }
+    ],
+    "option4": {
+      "foo4": "option4-foo4",
+      "bar4": ["bar41","bar42","bar43"]
+    }
+  },
+  {
+    "item": "itemArray03",
+    "quantity": 300,
+    "option3": [
+      {
+        "foo": ["foo01", "foo02", "foo03"],
+        "bar": ["bar01", "bar02", "bar03"]
+      },
+      {
+        "foo": ["foo11", "foo02", "foo03"],
+        "bar": ["bar11", "bar02", "bar03"]
+      }
+    ],
+    "option4": {
+      "foo4": "option4-foo4",
+      "bar4": ["bar41","bar42","bar43"]
+    }
+  }
+]
