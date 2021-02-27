@@ -1,5 +1,6 @@
 package blanco.restautotest.task;
 
+import blanco.commons.util.BlancoStringUtil;
 import blanco.restautotest.BlancoRestAutotestUtil;
 import blanco.restautotest.BlancoRestAutotestXml2JavaClass;
 import blanco.restautotest.BlancoRestAutotestXmlParser;
@@ -100,6 +101,14 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
                 System.out.println("/* tueda */ TARGETDIR = " + strTarget);
             }
 
+            BlancoRestAutotestUtil.isVerbose = input.getVerbose();
+            BlancoRestAutotestUtil.isOutputJson = input.getOutputJson();
+            BlancoRestAutotestUtil.jsonDataDir = input.getJsonDataDir();
+            String encoding = input.getEncoding();
+            if (BlancoStringUtil.null2Blank(encoding).length() > 0) {
+                BlancoRestAutotestUtil.fileEncoding = encoding;
+            }
+
             /*
              * ValueObject定義書から生成されているはずの xml を読み込む
              */
@@ -118,10 +127,6 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
             final File[] fileMeta2 = new File(input.getTmpdir()
                     + BlancoRestAutotestConstants.TARGET_SUBDIRECTORY)
                     .listFiles();
-
-            BlancoRestAutotestUtil.isVerbose = input.getVerbose();
-            BlancoRestAutotestUtil.isOutputJson = input.getOutputJson();
-            BlancoRestAutotestUtil.jsonDataDir = input.getJsonDataDir();
 
             List<BlancoRestAutotestTestCaseData> allTestCaseDataList = new ArrayList<>();
             for (int index = 0; index < fileMeta2.length; index++) {

@@ -45,6 +45,8 @@ public class BlancoRestAutotestUtil {
     public static int expectedColumnMax = BlancoRestAutotestConstants.OUTPUT_MAX;
     /** 現在処理中の InputResult シートの Expected プロパティ行の数 */
     public static int expectedNestDepth = Integer.MAX_VALUE;
+    /** ソースコード書き出し時以外のファイル読み書きで使用するencoding。 */
+    public static String fileEncoding = "UTF-8";
 
     /**
      * 型が指定される場合があるので、ValueObject定義書から情報を読み取っておきます。
@@ -691,7 +693,7 @@ public class BlancoRestAutotestUtil {
 
     public static String readJsonFile(String filename) throws IOException {
         File jsonFile = new File(filename);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile)));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFile), BlancoRestAutotestUtil.fileEncoding));
 
         StringBuffer sb = new StringBuffer();
         for (String line = reader.readLine();

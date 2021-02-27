@@ -157,11 +157,11 @@ public class BlancoRestAutotestXml2JavaClass {
             System.out.println("新規ディレクトリを作成しました。 FilePath : " + file.getAbsolutePath());
         }
         try {
-            FileWriter fileWriter = new FileWriter(argDirectoryTarget.getAbsolutePath() + "/" + fileName);
-            PrintWriter printWriter = new PrintWriter(new BufferedWriter(fileWriter));
+            File jsonFile = new File(argDirectoryTarget.getAbsolutePath() + "/" + fileName);
+            PrintWriter printWriter = new PrintWriter(new BufferedWriter(
+                    new OutputStreamWriter(new FileOutputStream(jsonFile), BlancoRestAutotestUtil.fileEncoding)));
             printWriter.print(jsonData);
             printWriter.close();
-            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
