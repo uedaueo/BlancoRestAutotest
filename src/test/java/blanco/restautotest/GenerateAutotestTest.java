@@ -11,7 +11,7 @@ public class GenerateAutotestTest {
     @Test
     public void testGenerateAutotest() {
         BlancoRestAutotestProcessInput input = new BlancoRestAutotestProcessInput();
-        input.setMetadir("meta/test2");
+        input.setMetadir("meta/test3");
         input.setEncoding("UTF-8");
         input.setSheetType("php");
         input.setTmpdir("tmpTest");

@@ -985,6 +985,43 @@ public class BlancoRestAutotestXmlParser {
         return isEmpty;
     }
 
+    /**
+     * 空のObjectかどうかをチェックする
+     *
+     * @param argFieldStructure
+     * @param argColumnTag
+     * @param argColumnStart
+     * @param argColumnEnd
+     * @return
+     * @throws NoSuchMethodException
+     * @throws IllegalAccessException
+     * @throws InvocationTargetException
+     */
+    private Boolean isEmptyObject(
+            final BlancoRestAutotestInputResultFieldStructure argFieldStructure,
+            final String argColumnTag,
+            final int argColumnStart,
+            final int argColumnEnd,
+            final String argIndent
+    ) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        boolean isEmpty = false;
+        if (argFieldStructure != null && BlancoStringUtil.null2Blank(argFieldStructure.getNo()).length() > 0) {
+            String firstColumnName = argColumnTag + argColumnStart;
+            String endColumnName = argColumnTag + argColumnEnd;
+            String startValue = BlancoRestAutotestUtil.getStringValue(argFieldStructure, firstColumnName);
+            String endValue = BlancoRestAutotestUtil.getStringValue(argFieldStructure, endColumnName);
+            System.out.println(argIndent + "isEmptyObject : first = " + firstColumnName + ", end = " + endColumnName + " (" + startValue + "," + endValue + ")");
+            isEmpty = "{}".equals(startValue);
+            if (!isEmpty) {
+                isEmpty = "{".equals(startValue);
+                if (isEmpty) {
+                    isEmpty = "}".equals(endValue);
+                }
+            }
+        }
+        return isEmpty;
+    }
+
     private String makePropertyTree(
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final int argColumnNumber,
@@ -1738,7 +1775,17 @@ public class BlancoRestAutotestXmlParser {
         if (BlancoRestAutotestUtil.isVerbose) {
             System.out.println(argIndent + "### readProperty object: propKey = " + propKey + ", propMax = " + propertyMax + ", propObj = " + argPropObj.getClass().getName());
         }
-        for (int index = argColumnNumber; index < argColumnNumber + propertyMax; index += propSize) {
+        Boolean isEmpty = this.isEmptyObject(
+                argFieldStructureList.get(argCaseLineStart),
+                argColumnTag,
+                argColumnNumber,
+                argColumnNumber + propertyMax - 1,
+                argIndent
+        );
+        if (isEmpty) {
+            readLine = 1;
+        }
+        for (int index = argColumnNumber; (index < argColumnNumber + propertyMax) && !isEmpty; index += propSize) {
             String columnName = argColumnTag + index;
             String propertyList = argPropertyMap.get(columnName);
             if (BlancoRestAutotestUtil.isVerbose) {
@@ -1782,7 +1829,7 @@ public class BlancoRestAutotestXmlParser {
                 }
             }
         }
-        if (hasValue) {
+        if (hasValue || isEmpty) {
             if (!argParentObj.getClass().getName().equals(argPropObj.getClass().getName())) {
                 /* Array から Generic で呼び出された場合は argParentObj と propObj が同じになっている */
                 BlancoRestAutotestUtil.setValue(argParentObj, argPropId, argPropObj);
