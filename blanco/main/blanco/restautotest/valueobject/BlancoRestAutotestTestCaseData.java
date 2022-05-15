@@ -420,15 +420,15 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
-     * このバリューオブジェクトの文字列表現を取得します。
+     * Gets the string representation of this value object.
      *
-     * <P>使用上の注意</P>
+     * <P>Precautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ文字列化の処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the stringification process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
-     * @return バリューオブジェクトの文字列表現。
+     * @return String representation of a value object.
      */
     @Override
     public String toString() {
@@ -453,12 +453,12 @@ public class BlancoRestAutotestTestCaseData {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -472,7 +472,7 @@ public class BlancoRestAutotestTestCaseData {
 
         // Name: fInput
         // Type: blanco.restgenerator.valueobject.ApiTelegram
-        // フィールド[fInput]はサポート外の型[blanco.restgenerator.valueobject.ApiTelegram]です。
+        // Field[fInput] is an unsupported type[blanco.restgenerator.valueobject.ApiTelegram].
         // Name: fInputId
         // Type: java.lang.String
         target.fInputId = this.fInputId;
@@ -481,7 +481,7 @@ public class BlancoRestAutotestTestCaseData {
         target.fSimpleInputId = this.fSimpleInputId;
         // Name: fExpect
         // Type: blanco.restgenerator.valueobject.ApiTelegram
-        // フィールド[fExpect]はサポート外の型[blanco.restgenerator.valueobject.ApiTelegram]です。
+        // Field[fExpect] is an unsupported type[blanco.restgenerator.valueobject.ApiTelegram].
         // Name: fExpectId
         // Type: java.lang.String
         target.fExpectId = this.fExpectId;
@@ -499,13 +499,13 @@ public class BlancoRestAutotestTestCaseData {
         target.fExpectedColumnMax = this.fExpectedColumnMax;
         // Name: fPropertyMap
         // Type: java.util.Map
-        // フィールド[fPropertyMap]はサポート外の型[java.util.MapString, String]です。
+        // Field[fPropertyMap] is an unsupported type[java.util.MapString, String].
         // Name: fPropertySizeMap
         // Type: java.util.Map
-        // フィールド[fPropertySizeMap]はサポート外の型[java.util.MapString, Integer]です。
+        // Field[fPropertySizeMap] is an unsupported type[java.util.MapString, Integer].
         // Name: fAssertKindListMap
         // Type: java.util.Map
-        // フィールド[fAssertKindListMap]はサポート外の型[java.util.Mapjava.lang.String, java.util.List<String>]です。
+        // Field[fAssertKindListMap] is an unsupported type[java.util.Mapjava.lang.String, java.util.List<String>].
         // Name: fTargetApiSimpleId
         // Type: java.lang.String
         target.fTargetApiSimpleId = this.fTargetApiSimpleId;

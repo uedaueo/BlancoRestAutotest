@@ -175,12 +175,12 @@ public class CodeDefinition2 {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -200,7 +200,7 @@ public class CodeDefinition2 {
         target.fCodeName = this.fCodeName;
         // Name: fReason
         // Type: java.util.ArrayList
-        // フィールド[fReason]はサポート外の型[java.util.ArrayListjava.lang.String]です。
+        // Field[fReason] is an unsupported type[java.util.ArrayListjava.lang.String].
         // Name: fUsername
         // Type: java.lang.String
         target.fUsername = this.fUsername;
@@ -209,6 +209,6 @@ public class CodeDefinition2 {
         target.fMemo = this.fMemo;
         // Name: fNumList
         // Type: java.util.ArrayList
-        // フィールド[fNumList]はサポート外の型[java.util.ArrayListjava.lang.Long]です。
+        // Field[fNumList] is an unsupported type[java.util.ArrayListjava.lang.Long].
     }
 }

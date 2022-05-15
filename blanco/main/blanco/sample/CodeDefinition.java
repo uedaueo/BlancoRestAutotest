@@ -65,12 +65,12 @@ public class CodeDefinition {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -87,6 +87,6 @@ public class CodeDefinition {
         target.fCodeName = this.fCodeName;
         // Name: fCodes
         // Type: java.util.ArrayList
-        // フィールド[fCodes]はサポート外の型[java.util.ArrayListblanco.sample.Code]です。
+        // Field[fCodes] is an unsupported type[java.util.ArrayListblanco.sample.Code].
     }
 }

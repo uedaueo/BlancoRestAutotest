@@ -86,12 +86,12 @@ public class ObjectSample {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -105,7 +105,7 @@ public class ObjectSample {
 
         // Name: fObject21
         // Type: blanco.sample.Object2Sample
-        // フィールド[fObject21]はサポート外の型[blanco.sample.Object2Sample]です。
+        // Field[fObject21] is an unsupported type[blanco.sample.Object2Sample].
         // Name: fPrimitive21
         // Type: java.lang.String
         target.fPrimitive21 = this.fPrimitive21;

@@ -53,12 +53,12 @@ public class TableSampleOption3 {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -72,9 +72,9 @@ public class TableSampleOption3 {
 
         // Name: fFoo
         // Type: java.util.ArrayList
-        // フィールド[fFoo]はサポート外の型[java.util.ArrayListjava.lang.String]です。
+        // Field[fFoo] is an unsupported type[java.util.ArrayListjava.lang.String].
         // Name: fBar
         // Type: java.util.ArrayList
-        // フィールド[fBar]はサポート外の型[java.util.ArrayListjava.lang.String]です。
+        // Field[fBar] is an unsupported type[java.util.ArrayListjava.lang.String].
     }
 }

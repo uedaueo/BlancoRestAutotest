@@ -99,12 +99,12 @@ public class TableSampleOption {
     }
 
     /**
-     * このバリューオブジェクトを指定のターゲットに複写します。
+     * Copies this value object to the specified target.
      *
-     * <P>使用上の注意</P>
+     * <P>Cautions for use</P>
      * <UL>
-     * <LI>オブジェクトのシャロー範囲のみ複写処理対象となります。
-     * <LI>オブジェクトが循環参照している場合には、このメソッドは使わないでください。
+     * <LI>Only the shallow range of the object will be subject to the copying process.
+     * <LI>Do not use this method if the object has a circular reference.
      * </UL>
      *
      * @param target target value object.
@@ -124,9 +124,9 @@ public class TableSampleOption {
         target.fQuantity = this.fQuantity;
         // Name: fOption3
         // Type: java.util.ArrayList
-        // フィールド[fOption3]はサポート外の型[java.util.ArrayListblanco.sample.TableSampleOption3]です。
+        // Field[fOption3] is an unsupported type[java.util.ArrayListblanco.sample.TableSampleOption3].
         // Name: fOption4
         // Type: blanco.sample.TableSampleOption4
-        // フィールド[fOption4]はサポート外の型[blanco.sample.TableSampleOption4]です。
+        // Field[fOption4] is an unsupported type[blanco.sample.TableSampleOption4].
     }
 }

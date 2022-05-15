@@ -5,49 +5,49 @@ import java.io.IOException;
 import blanco.restautotest.task.valueobject.BlancoRestAutotestProcessInput;
 
 /**
- * バッチ処理クラス [BlancoRestAutotestBatchProcess]。
+ * Batch process class [BlancoRestAutotestBatchProcess].
  *
- * <P>バッチ処理の呼び出し例。</P>
+ * <P>Example of a batch processing call.</P>
  * <code>
- * java -classpath (クラスパス) blanco.restautotest.task.BlancoRestAutotestBatchProcess -help
+ * java -classpath (classpath) blanco.restautotest.task.BlancoRestAutotestBatchProcess -help
  * </code>
  */
 public class BlancoRestAutotestBatchProcess {
     /**
-     * 正常終了。
+     * Normal end.
      */
     public static final int END_SUCCESS = 0;
 
     /**
-     * 入力異常終了。内部的にjava.lang.IllegalArgumentExceptionが発生した場合。
+     * Termination due to abnormal input. In the case that java.lang.IllegalArgumentException is raised internally.
      */
     public static final int END_ILLEGAL_ARGUMENT_EXCEPTION = 7;
 
     /**
-     * 入出力例外終了。内部的にjava.io.IOExceptionが発生した場合。
+     * Termination due to I/O exception. In the case that java.io.IOException is raised internally.
      */
     public static final int END_IO_EXCEPTION = 8;
 
     /**
-     * 異常終了。バッチの処理開始に失敗した場合、および内部的にjava.lang.Errorまたはjava.lang.RuntimeExceptionが発生した場合。
+     * Abnormal end. In the case that batch process fails to start or java.lang.Error or java.lang.RuntimeException is raised internally.
      */
     public static final int END_ERROR = 9;
 
     /**
-     * コマンドラインから実行された際のエントリポイントです。
+     * The entry point when executed from the command line.
      *
-     * @param args コンソールから引き継がれた引数。
+     * @param args Agruments inherited from the console.
      */
     public static final void main(final String[] args) {
         final BlancoRestAutotestBatchProcess batchProcess = new BlancoRestAutotestBatchProcess();
 
-        // バッチ処理の引数。
+        // Arguments for batch process.
         final BlancoRestAutotestProcessInput input = new BlancoRestAutotestProcessInput();
 
         boolean isNeedUsage = false;
         boolean isFieldMetadirProcessed = false;
 
-        // コマンドライン引数の解析をおこないます。
+        // Parses command line arguments.
         for (int index = 0; index < args.length; index++) {
             String arg = args[index];
             if (arg.startsWith("-verbose=")) {
@@ -79,7 +79,7 @@ public class BlancoRestAutotestBatchProcess {
                 usage();
                 System.exit(END_SUCCESS);
             } else {
-                System.out.println("BlancoRestAutotestBatchProcess: 入力パラメータ[" + arg + "]は無視されました。");
+                System.out.println("BlancoRestAutotestBatchProcess: The input parameter[" + arg + "] was ignored.");
                 isNeedUsage = true;
             }
         }
@@ -89,148 +89,148 @@ public class BlancoRestAutotestBatchProcess {
         }
 
         if( isFieldMetadirProcessed == false) {
-            System.out.println("BlancoRestAutotestBatchProcess: 処理開始失敗。入力パラメータ[input]の必須フィールド値[metadir]に値が設定されていません。");
+            System.out.println("BlancoRestAutotestBatchProcess: Failed to start the process. The required field value[metadir] in the input parameter[input] is not set to a value.");
             System.exit(END_ILLEGAL_ARGUMENT_EXCEPTION);
         }
 
         int retCode = batchProcess.execute(input);
 
-        // 終了コードを戻します。
-        // ※注意：System.exit()を呼び出している点に注意してください。
+        // Returns the exit code.
+        // Note: Please note that calling System.exit().
         System.exit(retCode);
     }
 
     /**
-     * 具体的なバッチ処理内容を記述するためのメソッドです。
+     * A method to describe the specific batch processing contents.
      *
-     * このメソッドに実際の処理内容を記述します。
+     * This method is used to describe the actual process.
      *
-     * @param input バッチ処理の入力パラメータ。
-     * @return バッチ処理の終了コード。END_SUCCESS, END_ILLEGAL_ARGUMENT_EXCEPTION, END_IO_EXCEPTION, END_ERROR のいずれかの値を戻します。
-     * @throws IOException 入出力例外が発生した場合。
-     * @throws IllegalArgumentException 入力値に不正が見つかった場合。
+     * @param input Input parameters for batch process.
+     * @return The exit code for batch process. Returns one of the values END_SUCCESS, END_ILLEGAL_ARGUMENT_EXCEPTION, END_IO_EXCEPTION, END_ERROR
+     * @throws IOException If an I/O exception occurs.
+     * @throws IllegalArgumentException If an invalid input value is found.
      */
     public int process(final BlancoRestAutotestProcessInput input) throws IOException, IllegalArgumentException {
-        // 入力パラメータをチェックします。
+        // Checks the input parameters.
         validateInput(input);
 
-        // この箇所でコンパイルエラーが発生する場合、BlancoRestAutotestProcessインタフェースを実装して blanco.restautotest.taskパッケージに BlancoRestAutotestProcessImplクラスを作成することにより解決できる場合があります。
+        // If you get a compile error at this point, You may be able to solve it by implementing a BlancoRestAutotestProcess interface and creating an BlancoRestAutotestProcessImpl class in package blanco.restautotest.task.
         final BlancoRestAutotestProcess process = new BlancoRestAutotestProcessImpl();
 
-        // 処理の本体を実行します。
+        // Executes the main body of the process.
         final int retCode = process.execute(input);
 
         return retCode;
     }
 
     /**
-     * クラスをインスタンス化してバッチを実行する際のエントリポイントです。
+     * The entry point for instantiating a class and running a batch.
      *
-     * このメソッドは下記の仕様を提供します。
+     * This method provides the following specifications.
      * <ul>
-     * <li>メソッドの入力パラメータの内容チェック。
-     * <li>IllegalArgumentException, RuntimeException, Errorなどの例外をcatchして戻り値へと変換。
+     * <li>Checks the contents of the input parameters of the method.
+     * <li>Catches exceptions such as IllegalArgumentException, RuntimeException, Error, etc. and converts them to return values.
      * </ul>
      *
-     * @param input バッチ処理の入力パラメータ。
-     * @return バッチ処理の終了コード。END_SUCCESS, END_ILLEGAL_ARGUMENT_EXCEPTION, END_IO_EXCEPTION, END_ERROR のいずれかの値を戻します。
-     * @throws IllegalArgumentException 入力値に不正が見つかった場合。
+     * @param input Input parameters for batch process.
+     * @return The exit code for batch process. Returns one of the values END_SUCCESS, END_ILLEGAL_ARGUMENT_EXCEPTION, END_IO_EXCEPTION, END_ERROR
+     * @throws IllegalArgumentException If an invalid input value is found.
      */
     public final int execute(final BlancoRestAutotestProcessInput input) throws IllegalArgumentException {
         try {
-            // バッチ処理の本体を実行します。
+            // Executes the main body of the batch process.
             int retCode = process(input);
 
             return retCode;
         } catch (IllegalArgumentException ex) {
-            System.out.println("BlancoRestAutotestBatchProcess: 入力例外が発生しました。バッチ処理を中断します。:" + ex.toString());
-            // 入力異常終了。
+            System.out.println("BlancoRestAutotestBatchProcess: An input exception has occurred. Abort the batch process.:" + ex.toString());
+            // Termination due to abnormal input.
             return END_ILLEGAL_ARGUMENT_EXCEPTION;
         } catch (IOException ex) {
-            System.out.println("BlancoRestAutotestBatchProcess: 入出力例外が発生しました。バッチ処理を中断します。:" + ex.toString());
-            // 入力異常終了。
+            System.out.println("BlancoRestAutotestBatchProcess: An I/O exception has occurred. Abort the batch process.:" + ex.toString());
+            // Termination due to abnormal input.
             return END_IO_EXCEPTION;
         } catch (RuntimeException ex) {
-            System.out.println("BlancoRestAutotestBatchProcess: ランタイム例外が発生しました。バッチ処理を中断します。:" + ex.toString());
+            System.out.println("BlancoRestAutotestBatchProcess: A runtime exception has occurred. Abort the batch process.:" + ex.toString());
             ex.printStackTrace();
-            // 異常終了。
+            // Abnormal end.
             return END_ERROR;
         } catch (Error er) {
-            System.out.println("BlancoRestAutotestBatchProcess: ランタイムエラーが発生しました。バッチ処理を中断します。:" + er.toString());
+            System.out.println("BlancoRestAutotestBatchProcess: A runtime exception has occurred. Abort the batch process.:" + er.toString());
             er.printStackTrace();
-            // 異常終了。
+            // Abnormal end.
             return END_ERROR;
         }
     }
 
     /**
-     * このバッチ処理クラスの使い方の説明を標準出力に示すためのメソッドです。
+     * A method to show an explanation of how to use this batch processing class on the stdout.
      */
     public static final void usage() {
         System.out.println("BlancoRestAutotestBatchProcess: Usage:");
-        System.out.println("  java blanco.restautotest.task.BlancoRestAutotestBatchProcess -verbose=値1 -metadir=値2 -targetdir=値3 -tmpdir=値4 -encoding=値5 -xmlrootelement=値6 -sheetType=値7 -lineSeparator=値8 -targetStyle=値9 -outputJson=値10 -searchTmpdir=値11 -jsonDataDir=値12");
+        System.out.println("  java blanco.restautotest.task.BlancoRestAutotestBatchProcess -verbose=value1 -metadir=value2 -targetdir=value3 -tmpdir=value4 -encoding=value5 -xmlrootelement=value6 -sheetType=value7 -lineSeparator=value8 -targetStyle=value9 -outputJson=value10 -searchTmpdir=value11 -jsonDataDir=value12");
         System.out.println("    -verbose");
-        System.out.println("      説明[verboseモードで動作させるかどうか。]");
-        System.out.println("      型[真偽]");
-        System.out.println("      デフォルト値[false]");
+        System.out.println("      explanation[Whether to run in verbose mode.]");
+        System.out.println("      type[boolean]");
+        System.out.println("      default value[false]");
         System.out.println("    -metadir");
-        System.out.println("      説明[メタディレクトリ]");
-        System.out.println("      型[文字列]");
-        System.out.println("      必須パラメータ");
+        System.out.println("      explanation[メタディレクトリ]");
+        System.out.println("      type[string]");
+        System.out.println("      a required parameter");
         System.out.println("    -targetdir");
-        System.out.println("      説明[出力先フォルダを指定します。無指定の場合にはカレント直下のblancoを用います。]");
-        System.out.println("      型[文字列]");
-        System.out.println("      デフォルト値[test/blanco]");
+        System.out.println("      explanation[出力先フォルダを指定します。無指定の場合にはカレント直下のblancoを用います。]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[test/blanco]");
         System.out.println("    -tmpdir");
-        System.out.println("      説明[テンポラリフォルダを指定します。無指定の場合には、カレント直下のtmpを用います。]");
-        System.out.println("      型[文字列]");
-        System.out.println("      デフォルト値[tmp]");
+        System.out.println("      explanation[テンポラリフォルダを指定します。無指定の場合には、カレント直下のtmpを用います。]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[tmp]");
         System.out.println("    -encoding");
-        System.out.println("      説明[自動生成するソースファイルの文字エンコーディングを指定します。]");
-        System.out.println("      型[文字列]");
+        System.out.println("      explanation[自動生成するソースファイルの文字エンコーディングを指定します。]");
+        System.out.println("      type[string]");
         System.out.println("    -xmlrootelement");
-        System.out.println("      説明[XML ルート要素のアノテーションを出力するかどうか。JDK 1.6 以降が必要。]");
-        System.out.println("      型[真偽]");
-        System.out.println("      デフォルト値[false]");
+        System.out.println("      explanation[XML ルート要素のアノテーションを出力するかどうか。JDK 1.6 以降が必要。]");
+        System.out.println("      type[boolean]");
+        System.out.println("      default value[false]");
         System.out.println("    -sheetType");
-        System.out.println("      説明[meta定義書が期待しているプログラミング言語を指定します]");
-        System.out.println("      型[文字列]");
-        System.out.println("      デフォルト値[java]");
+        System.out.println("      explanation[meta定義書が期待しているプログラミング言語を指定します]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[java]");
         System.out.println("    -lineSeparator");
-        System.out.println("      説明[行末記号をしていします。LF=0x0a, CR=0x0d, CFLF=0x0d0x0a とします。LFがデフォルトです。]");
-        System.out.println("      型[文字列]");
-        System.out.println("      デフォルト値[LF]");
+        System.out.println("      explanation[行末記号をしていします。LF=0x0a, CR=0x0d, CFLF=0x0d0x0a とします。LFがデフォルトです。]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[LF]");
         System.out.println("    -targetStyle");
-        System.out.println("      説明[出力先フォルダの書式を指定します。<br>\nblanco: [targetdir]/main<br>\nmaven: [targetdir]/main/java<br>\nfree: [targetdir](targetdirが無指定の場合はblanco/main)]");
-        System.out.println("      型[文字列]");
-        System.out.println("      デフォルト値[blanco]");
+        System.out.println("      explanation[出力先フォルダの書式を指定します。<br>\nblanco: [targetdir]/main<br>\nmaven: [targetdir]/main/java<br>\nfree: [targetdir](targetdirが無指定の場合はblanco/main)]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[blanco]");
         System.out.println("    -outputJson");
-        System.out.println("      説明[電文をJSONファイルとして出力します。]");
-        System.out.println("      型[真偽]");
-        System.out.println("      デフォルト値[true]");
+        System.out.println("      explanation[電文をJSONファイルとして出力します。]");
+        System.out.println("      type[boolean]");
+        System.out.println("      default value[true]");
         System.out.println("    -searchTmpdir");
-        System.out.println("      説明[import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。]");
-        System.out.println("      型[文字列]");
+        System.out.println("      explanation[import文作成のために検索するtmpディレクトリをカンマ区切りで指定します。指定ディレクトリ直下のvalueobjectディレクトリの下にxmlを探しにいきます。]");
+        System.out.println("      type[string]");
         System.out.println("    -jsonDataDir");
-        System.out.println("      説明[Input / Expect データとして読み込むJSONファイルを配置する場所です。]");
-        System.out.println("      型[文字列]");
-        System.out.println("      デフォルト値[src/test/resources/json]");
+        System.out.println("      explanation[Input / Expect データとして読み込むJSONファイルを配置する場所です。]");
+        System.out.println("      type[string]");
+        System.out.println("      default value[src/test/resources/json]");
         System.out.println("    -? , -help");
-        System.out.println("      説明[使い方を表示します。]");
+        System.out.println("      explanation[show the usage.]");
     }
 
     /**
-     * このバッチ処理クラスの入力パラメータの妥当性チェックを実施するためのメソッドです。
+     * A method to check the validity of input parameters for this batch processing class.
      *
-     * @param input バッチ処理の入力パラメータ。
-     * @throws IllegalArgumentException 入力値に不正が見つかった場合。
+     * @param input Input parameters for batch process.
+     * @throws IllegalArgumentException If an invalid input value is found.
      */
     public void validateInput(final BlancoRestAutotestProcessInput input) throws IllegalArgumentException {
         if (input == null) {
-            throw new IllegalArgumentException("BlancoBatchProcessBatchProcess: 処理開始失敗。入力パラメータ[input]にnullが与えられました。");
+            throw new IllegalArgumentException("BlancoBatchProcessBatchProcess: Failed to start the process. The input parameter[input] was given as null.");
         }
         if (input.getMetadir() == null) {
-            throw new IllegalArgumentException("BlancoRestAutotestBatchProcess: 処理開始失敗。入力パラメータ[input]の必須フィールド値[metadir]に値が設定されていません。");
+            throw new IllegalArgumentException("BlancoRestAutotestBatchProcess: Failed to start the process. The required field value[metadir] in the input parameter[input] is not set to a value.");
         }
     }
 }
