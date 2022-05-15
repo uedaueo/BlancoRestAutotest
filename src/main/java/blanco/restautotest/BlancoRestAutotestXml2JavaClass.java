@@ -19,9 +19,11 @@ import blanco.restautotest.resourcebundle.BlancoRestAutotestResourceBundle;
 import blanco.restautotest.valueobject.BlancoRestAutotestInputResultFieldStructure;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseFieldStructure;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
@@ -136,6 +138,8 @@ public class BlancoRestAutotestXml2JavaClass {
         for (BlancoRestAutotestTestCaseData testCaseData : argAllTestCaseData) {
             ObjectMapper mapper = new ObjectMapper();
             mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+            mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
             printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
             String requestJson = mapper.writer(printer).writeValueAsString(testCaseData.getInput());
