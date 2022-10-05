@@ -11,10 +11,10 @@ public class GenerateAutotestTest {
     @Test
     public void testGenerateAutotest() {
         BlancoRestAutotestProcessInput input = new BlancoRestAutotestProcessInput();
-        input.setMetadir("meta/test3");
+        input.setMetadir("meta/test4");
         input.setEncoding("UTF-8");
         input.setSheetType("php");
-        input.setTmpdir("tmpTest");
+        input.setTmpdir("tmpTest4");
         input.setSearchTmpdir("tmp/api,tmp/telegrams");
         input.setTargetdir("sample/blanco");
         input.setTargetStyle("maven");

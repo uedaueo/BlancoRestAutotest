@@ -547,6 +547,18 @@ public class BlancoRestAutotestUtil {
         return isPrimitive;
     }
 
+    public static boolean isEnumType(Object argParentObj, String propId) throws NoSuchFieldException {
+        boolean isEnum = false;
+        String propertyId = propId;
+        String [] typedProperty = propId.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+        Field field = getFieldFromBlancoValueObject(argParentObj, propertyId);
+        isEnum = field.getType().isEnum();
+        return isEnum;
+    }
+
     public static Field getFieldFromBlancoValueObject(Object object, String property) throws NoSuchFieldException {
         if (object == null || BlancoStringUtil.null2Blank(property).length() == 0) {
             System.out.println("getFieldFromBlancoValueObject: arguments null.");
@@ -626,7 +638,6 @@ public class BlancoRestAutotestUtil {
             instance = Boolean.FALSE;
         } else {
             instance = field.getType().getConstructor(new Class<?>[0]).newInstance();
-
         }
         return instance;
     }
@@ -714,5 +725,97 @@ public class BlancoRestAutotestUtil {
         /* try with default deserializer. */
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, mapTo.getClass());
+    }
+
+    public static Method searchFirstGetter(Class<?> argEnumClazz) {
+        List<Method> myGetters = new ArrayList<>();
+        for (Method method : argEnumClazz.getDeclaredMethods()) {
+            if (method.getName().startsWith("get")) {
+                System.out.println("Enum getter found:" + method.getName());
+                myGetters.add(method);
+            }
+        }
+        return myGetters.get(0);
+    }
+
+    public static Object searchEnumElementByValue(
+            final Class<?> argEnumClazz,
+            final String argValue) throws InvocationTargetException, IllegalAccessException {
+        Object foundElement = null;
+        for (Object element : argEnumClazz.getEnumConstants()) {
+            Class<?> elementClazz = element.getClass();
+            Method getterMethod = searchFirstGetter(elementClazz);
+            String typeId = getterMethod.getReturnType().getName();
+            Object valueObj = argValue;
+            if ("java.lang.Integer".equals(typeId)) {
+                valueObj = Integer.parseInt(argValue);
+            } else if ("java.lang.Long".equals(typeId)) {
+                valueObj = Long.parseLong(argValue);
+            } else if ("java.lang.Float".equals(typeId)) {
+                valueObj = Float.parseFloat(argValue);
+            } else if ("java.lang.Double".equals(typeId)) {
+                valueObj = Double.parseDouble(argValue);
+            } else if ("java.lang.Boolean".equals(typeId)) {
+                valueObj = Boolean.parseBoolean(argValue);
+            } else if ("java.lang.String".equals(typeId)) {
+                String strValue = argValue;
+                if ("\"\"".equals(strValue)) {
+                    strValue = "";
+                }
+                valueObj = strValue;
+            } else {
+                throw new IllegalArgumentException("Cannot convert String to " + typeId);
+            }
+            Object elementValue = getterMethod.invoke(element);
+            if (elementValue.equals(valueObj)) {
+                foundElement = element;
+                break;
+            }
+        }
+        return foundElement;
+    }
+
+    public static Object searchEnumElementByName(
+            final Class<?> argEnumClazz,
+            final String argValue
+    ) {
+        Object foundElement = null;
+        for (Object element : argEnumClazz.getEnumConstants()) {
+            String elementName = ((Enum<?>) element).name();
+//            System.out.println("searchEnumValueByName: name = " + elementName);
+            if (elementName.equals(argValue)) {
+                foundElement = element;
+                break;
+            }
+        }
+        return foundElement;
+    }
+
+    public static void setEnumValue(Object parentObj, String property, String value) throws InvocationTargetException, IllegalAccessException {
+        if (parentObj == null || value == null || BlancoStringUtil.null2Blank(property).length() == 0) {
+            throw new IllegalArgumentException("setEnumValue: arguments null.");
+        }
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+
+        Class<?> parantClazz = parentObj.getClass();
+        String setterId = "set" + BlancoNameAdjuster.toClassName(propertyId);
+        Method method = getMethodByName(parantClazz, setterId);
+        Class<?> enumClazz = method.getParameterTypes()[0];
+        if (!enumClazz.isEnum()) {
+            throw new IllegalArgumentException("setEnumValue: property " + propertyId + " is NOT Enum.");
+        }
+//        Object valueEnum = searchEnumElementByValue(enumClazz, value);
+        Object valueEnum = searchEnumElementByName(enumClazz, value);
+
+        if (valueEnum == null) {
+            throw new IllegalArgumentException("setEnumValue: " + value + " is NOT enumerated in " + enumClazz.getSimpleName());
+        }
+
+//        System.out.println("setValue : parentObj = " + parentObj.getClass().getName() + ", propertyId = " + propertyId + ", valueObj = " + valueObj.getClass().getName() + ", value = " + value);
+        method.invoke(parentObj, valueEnum);
     }
 }

@@ -1362,51 +1362,53 @@ public class BlancoRestAutotestXmlParser {
             System.out.println(argIndent + "parentObj = " + argParentObj);
         }
 
-        Boolean isTypeSpecified = false;
+        /* Check modes. */
+        boolean isEnumMode = BlancoRestAutotestUtil.isEnumType(argParentObj, propId);;
+        boolean isJsonMode = false;
+        boolean isJsonArrayMode = false;
+        boolean isTypeSpecified = false;
         String [] typedPropId = propId.split(":");
         if (typedPropId.length > 1) {
             isTypeSpecified = true;
         }
 
         Object propObj = argParentObj;
-        if (!argNotSearchProp && !BlancoRestAutotestUtil.isPrimitiveObject(argParentObj)) {
-            propObj = BlancoRestAutotestUtil.getValue(argParentObj, propId);
-            if (propObj == null) {
-                propObj = BlancoRestAutotestUtil.createObjectFromProperty(argParentObj, propId);
+
+        if (!isEnumMode) {
+            if (!argNotSearchProp && !BlancoRestAutotestUtil.isPrimitiveObject(argParentObj)) {
+                propObj = BlancoRestAutotestUtil.getValue(argParentObj, propId);
+                if (propObj == null) {
+                    propObj = BlancoRestAutotestUtil.createObjectFromProperty(argParentObj, propId);
+                }
+            }
+            if (isTypeSpecified &&
+                    !argNotSearchProp &&
+                    !BlancoRestAutotestUtil.isArrayObject(propObj) &&
+                    !BlancoRestAutotestUtil.isPrimitiveObject(argParentObj)
+            ) {
+                String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
+                if (BlancoStringUtil.null2Blank(classId).length() == 0) {
+                    throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
+                }
+                propObj = BlancoRestAutotestUtil.createObjectById(classId);
+            }
+            if (argPropertyList.length == argPropertyDepth + 1) {
+                /* Check assertKind is JSON or NOT if this is leaf property. */
+                String assertKind = argAssertKindList.get(argColumnNumber - 1);
+                if (assertKind != null && assertKind.toLowerCase().startsWith("json")) {
+                    if (BlancoRestAutotestUtil.isVerbose) {
+                        System.out.println(argIndent + "### JSON assertion found : " + assertKind);
+                    }
+                    isJsonMode = true;
+                } else if (assertKind != null && assertKind.toLowerCase().startsWith("arrayofjson")) {
+                    isJsonMode = true;
+                    isJsonArrayMode = true;
+                }
             }
         }
-
-        if (isTypeSpecified &&
-                !argNotSearchProp &&
-                !BlancoRestAutotestUtil.isArrayObject(propObj) &&
-                !BlancoRestAutotestUtil.isPrimitiveObject(argParentObj)
-        ) {
-            String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
-            if (BlancoStringUtil.null2Blank(classId).length() == 0) {
-                throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
-            }
-            propObj = BlancoRestAutotestUtil.createObjectById(classId);
-        }
-
         if (BlancoRestAutotestUtil.isVerbose) {
             System.out.println(argIndent + "readProperty : propObj = " + propObj.getClass().getName());
             System.out.println(argIndent + "                         " + propObj);
-        }
-
-        Boolean isJsonMode = false;
-        Boolean isJsonArrayMode = false;
-        if (argPropertyList.length == argPropertyDepth + 1) {
-            /* Check assertKind is JSON or NOT if this is leaf property. */
-            String assertKind = argAssertKindList.get(argColumnNumber - 1);
-            if (assertKind != null && assertKind.toLowerCase().startsWith("json")) {
-                if (BlancoRestAutotestUtil.isVerbose) {
-                    System.out.println(argIndent + "### JSON assertion found : " + assertKind);
-                }
-                isJsonMode = true;
-            } else if (assertKind != null && assertKind.toLowerCase().startsWith("arrayofjson")) {
-                isJsonMode = true;
-                isJsonArrayMode = true;
-            }
         }
 
         /*
@@ -1415,8 +1417,25 @@ public class BlancoRestAutotestXmlParser {
          * * Objectの場合はインスタンスを作成し、次のプロパティチェックに進む
          * * Arrayの場合はまずArrayListのインスタンスを作成し、次に総称型を取得し、次のプロパティチェックに進む
          */
+        if (isEnumMode) {
+            readLine = this.processEnum(
+                    argParentObj,
+                    propObj,
+                    argPropertyDepth,
+                    argFieldStructureList,
+                    argCaseLineStart,
+                    argCaseLineMax,
+                    columnId,
+                    propId,
+                    argJsonFilenamePrefix,
+                    isTypeSpecified,
+                    typedPropId,
+                    isJsonArrayMode,
+                    argIndent,
+                    argSkipSetValue
+            );
+        } else
         if (isJsonMode) {
-
             readLine = this.processJson(
                     argParentObj,
                     propObj,
@@ -1980,5 +1999,50 @@ public class BlancoRestAutotestXmlParser {
             }
         }
         return obj;
+    }
+
+    private int processEnum(
+            final Object argParentObj,
+            final Object argPropObj,
+            final int argPropertyDepth,
+            final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
+            final int argCaseLineStart,
+            final int argCaseLineMax,
+            final String argColumnId,
+            final String argPropId,
+            final String argJsonFilenamePrefix,
+            final Boolean isTypeSpecified,
+            final String [] typedPropId,
+            final Boolean isJsonArrayMode,
+            final String argIndent,
+            final Boolean argSkipSetValue
+    ) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        int readLine = 0;
+        BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart);
+        if (fieldStructure != null) {
+            String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
+            if (BlancoRestAutotestUtil.isVerbose) {
+                System.out.println(argIndent + "readProperty: enum: " + value + " skip ? " + argSkipSetValue);
+            }
+            if (value != null) {
+                /* ここで array の terminator チェック */
+                if (value.startsWith("#")) {
+                    this.terminateArrayDepth = value.length();
+                    readLine = 0;
+                } else {
+                    if (!argSkipSetValue) {
+                        BlancoRestAutotestUtil.setEnumValue(argParentObj, argPropId, value);
+                    } else {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "readProperty: primitive: SKIP TO SET VALUE.");
+                        }
+                    }
+                    readLine = 1;
+                }
+            } else {
+                readLine = 0;
+            }
+        }
+        return readLine;
     }
 }
