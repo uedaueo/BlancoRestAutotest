@@ -1363,7 +1363,7 @@ public class BlancoRestAutotestXmlParser {
         }
 
         /* Check modes. */
-        boolean isEnumMode = BlancoRestAutotestUtil.isEnumType(argParentObj, propId);;
+        boolean isEnumMode = BlancoRestAutotestUtil.isEnumType(argParentObj, propId, argNotSearchProp);;
         boolean isJsonMode = false;
         boolean isJsonArrayMode = false;
         boolean isTypeSpecified = false;
@@ -1420,17 +1420,10 @@ public class BlancoRestAutotestXmlParser {
         if (isEnumMode) {
             readLine = this.processEnum(
                     argParentObj,
-                    propObj,
-                    argPropertyDepth,
                     argFieldStructureList,
                     argCaseLineStart,
-                    argCaseLineMax,
                     columnId,
                     propId,
-                    argJsonFilenamePrefix,
-                    isTypeSpecified,
-                    typedPropId,
-                    isJsonArrayMode,
                     argIndent,
                     argSkipSetValue
             );
@@ -1645,27 +1638,64 @@ public class BlancoRestAutotestXmlParser {
         int readLine0 = 0;
         int arrayCount = 0;
         for (arrayCount = 0; arrayCount < arrayEndIndex - argCaseLineStart + 1; arrayCount = arrayCount + readLine0) {
+            boolean isEnumGeneric = false;
+            String enumClassId = null;
             Object genericObj = null;
             if (isTypeSpecified) {
                 String classId = BlancoRestAutotestUtil.getClassIdFromSimpleID(typedPropId[1].trim());
                 if (BlancoStringUtil.null2Blank(classId).length() == 0) {
                     throw new IllegalArgumentException(fMsg.getMbvoji09(argParentObj.getClass().getName(), typedPropId[1]));
                 }
-                genericObj = BlancoRestAutotestUtil.createObjectById(classId);
+                if (!BlancoRestAutotestUtil.isEnumType(classId)) {
+                    genericObj = BlancoRestAutotestUtil.createObjectById(classId);
+                } else {
+                    isEnumGeneric = true;
+                    enumClassId = classId;
+                }
             } else {
-                genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, argPropId);
+                if (!BlancoRestAutotestUtil.isEnumGenericType(argParentObj, argPropId)) {
+                    genericObj = BlancoRestAutotestUtil.createGenericFromProperty(argParentObj, argPropId);
+                } else {
+                    isEnumGeneric = true;
+                    enumClassId = BlancoRestAutotestUtil.getSimpleGnericIdFromProperty(argParentObj, argPropId);
+                }
             }
-            if (genericObj == null) {
+            if (!isEnumGeneric && genericObj == null) {
                 throw new IllegalArgumentException("Array には総称型の指定が必須です。");
             }
             if (arrayCount == 0) {
-                if (BlancoRestAutotestUtil.isVerbose) {
+                if (BlancoRestAutotestUtil.isVerbose && !isEnumGeneric) {
                     System.out.println(argIndent + "Generci = " + genericObj.getClass().getName());
                     System.out.println(argIndent + "          " + genericObj);
                 }
             }
-            boolean isPrimitiveGeneric = BlancoRestAutotestUtil.isPrimitiveObject(genericObj);
-            if (isPrimitiveGeneric) {
+            if (isEnumGeneric) {
+                BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
+                if (fieldStructure != null) {
+                    String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
+                    if (value != null && value.startsWith("#")) {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "processArray array: enum: " + value + " is ignored");
+                        }
+                    } else if (!isEmptyArray) {
+                        Object enumGenericObj = BlancoRestAutotestUtil.createEnumObjFromIdAndValue(enumClassId, value);
+                        if (enumGenericObj == null) {
+                            throw new IllegalArgumentException("processArray: " + value + " is NOT enumerated in " + enumClassId);
+                        }
+                        BlancoRestAutotestUtil.addToList(argPropObj, enumGenericObj);
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "processArray array: enum: " + value + " is pushed to " + argPropObj.getClass().getName());
+                        }
+                    } else {
+                        if (BlancoRestAutotestUtil.isVerbose) {
+                            System.out.println(argIndent + "processArray array: enum: " + value + " is ignored because of marked as empty array");
+                        }
+                    }
+                    readLine0 = 1;
+                    readLine++;
+                }
+            } else
+            if (BlancoRestAutotestUtil.isPrimitiveObject(genericObj)) {
                 BlancoRestAutotestInputResultFieldStructure fieldStructure = argFieldStructureList.get(argCaseLineStart + arrayCount);
                 if (fieldStructure != null) {
                     String value = BlancoRestAutotestUtil.getStringValue(fieldStructure, argColumnId);
@@ -2003,17 +2033,10 @@ public class BlancoRestAutotestXmlParser {
 
     private int processEnum(
             final Object argParentObj,
-            final Object argPropObj,
-            final int argPropertyDepth,
             final List<BlancoRestAutotestInputResultFieldStructure> argFieldStructureList,
             final int argCaseLineStart,
-            final int argCaseLineMax,
             final String argColumnId,
             final String argPropId,
-            final String argJsonFilenamePrefix,
-            final Boolean isTypeSpecified,
-            final String [] typedPropId,
-            final Boolean isJsonArrayMode,
             final String argIndent,
             final Boolean argSkipSetValue
     ) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {

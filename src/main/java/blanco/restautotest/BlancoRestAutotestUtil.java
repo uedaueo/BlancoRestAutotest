@@ -404,6 +404,9 @@ public class BlancoRestAutotestUtil {
         addToList(list, valueObj);
     }
 
+    public static void addEnumToList(Object list, Object value) {
+
+    }
 
 //    public static Object initObjectProperty(final Object object, final String property) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, InstantiationException, NoSuchFieldException {
 //        if (object == null || BlancoStringUtil.null2Blank(property).length() == 0) {
@@ -456,21 +459,13 @@ public class BlancoRestAutotestUtil {
      * @return
      */
     public static Object createSimpleGenericFromField(final Field argField) {
-        if (argField == null) {
-            return null;
-        }
-        String genericType = argField.getGenericType().getTypeName();
-        if (genericType == null) {
-            return null;
-        }
-        int genericStart = genericType.indexOf("<");
-        if (genericStart == -1) {
-            return null;
-        }
         /*
          * Generic は List<Hoge> 的な単純なもの前提
          */
-        String genericId = genericType.substring(genericStart + 1, genericType.length() - 1);
+        String genericId = getSimpleGenericIdFromField(argField);
+        if (BlancoStringUtil.null2Blank(genericId).length() == 0) {
+            return null;
+        }
         Object instance = null;
         if ("java.lang.Integer".equals(genericId)) {
             instance = Integer.MAX_VALUE;
@@ -486,6 +481,24 @@ public class BlancoRestAutotestUtil {
             instance = createObjectById(genericId);
         }
         return instance;
+    }
+
+    public static String getSimpleGenericIdFromField(final Field argField) {
+        if (argField == null) {
+            return null;
+        }
+        String genericType = argField.getGenericType().getTypeName();
+        if (genericType == null) {
+            return null;
+        }
+        int genericStart = genericType.indexOf("<");
+        if (genericStart == -1) {
+            return null;
+        }
+        /*
+         * Generic は List<Hoge> 的な単純なもの前提
+         */
+        return genericType.substring(genericStart + 1, genericType.length() - 1);
     }
 
     /**
@@ -547,16 +560,62 @@ public class BlancoRestAutotestUtil {
         return isPrimitive;
     }
 
-    public static boolean isEnumType(Object argParentObj, String propId) throws NoSuchFieldException {
+    public static boolean isEnumGenericType(Object argParentObj, String propId) throws NoSuchFieldException {
+        Field field = getFieldFromBlancoValueObject(argParentObj, propId);
+        String genericId = getSimpleGenericIdFromField(field);
+        return isEnumType(genericId);
+    }
+
+    public static boolean isEnumType(Object argParentObj, String propId, boolean argNoSearchProp) throws NoSuchFieldException {
         boolean isEnum = false;
         String propertyId = propId;
         String [] typedProperty = propId.split(":");
         if (typedProperty.length > 1) {
             propertyId = typedProperty[0].trim();
         }
-        Field field = getFieldFromBlancoValueObject(argParentObj, propertyId);
-        isEnum = field.getType().isEnum();
+        if (argNoSearchProp) {
+            isEnum = argParentObj.getClass().isEnum();
+        } else {
+            Field field = getFieldFromBlancoValueObject(argParentObj, propertyId);
+            isEnum = field.getType().isEnum();
+        }
         return isEnum;
+    }
+
+    public static boolean isEnumType(Object argParentObj, String propId) throws NoSuchFieldException {
+        return isEnumType(argParentObj, propId, false);
+    }
+
+    public static boolean isEnumType(String classId) {
+        boolean isEnum = false;
+        try {
+            Class<?> clazz = Class.forName(classId);
+            isEnum = clazz.isEnum();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return isEnum;
+    }
+
+    public static Object createEnumObjFromIdAndValue(String enumClassId, String argValue) {
+        Object element = null;
+        try {
+            Class<?> clazz = Class.forName(enumClassId);
+            element = BlancoRestAutotestUtil.searchEnumElementByName(clazz, argValue);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return element;
+    }
+
+    public static String getSimpleGnericIdFromProperty(Object parentObj, String property) throws NoSuchFieldException {
+        String propertyId = property;
+        String [] typedProperty = property.split(":");
+        if (typedProperty.length > 1) {
+            propertyId = typedProperty[0].trim();
+        }
+        Field field = getFieldFromBlancoValueObject(parentObj, propertyId);
+        return getSimpleGenericIdFromField(field);
     }
 
     public static Field getFieldFromBlancoValueObject(Object object, String property) throws NoSuchFieldException {
