@@ -12,51 +12,11 @@ import blanco.restgenerator.valueobject.ApiPostTelegram;
  */
 public class PostEnumStatusArraySamplePostRequest extends ApiPostTelegram {
     /**
-     * フィールド [id]
-     *
-     * 項目の型 [java.lang.Long]
-     */
-    private Long fId;
-
-    /**
      * フィールド [status]
      *
      * 項目の型 [java.util.ArrayList]
      */
-    private ArrayList<EnumStatus> fStatus;
-
-    /**
-     * フィールド [id]のセッターメソッド
-     *
-     * 項目の型 [java.lang.Long]
-     *
-     * @param argId フィールド[id]に格納したい値
-     */
-    public void setId(final Long argId) {
-        this.fId = argId;
-    }
-
-    /**
-     * フィールド[id]のゲッターメソッド
-     *
-     * 項目の型 [java.lang.Long]
-     *
-     * @return フィールド[id]に格納されている値
-     */
-    public Long getId() {
-        return this.fId;
-    }
-
-    /**
-     * フィールド[id]のゲッターメソッド
-     *
-     * 項目の型 [java.lang.String]
-     *
-     * @return フィールド[id]の型名文字列
-     */
-    public static String typeId() {
-        return "java.lang.Long";
-    }
+    private ArrayList<StatusObject> fStatus;
 
     /**
      * フィールド [status]のセッターメソッド
@@ -65,7 +25,7 @@ public class PostEnumStatusArraySamplePostRequest extends ApiPostTelegram {
      *
      * @param argStatus フィールド[status]に格納したい値
      */
-    public void setStatus(final ArrayList<EnumStatus> argStatus) {
+    public void setStatus(final ArrayList<StatusObject> argStatus) {
         this.fStatus = argStatus;
     }
 
@@ -76,7 +36,7 @@ public class PostEnumStatusArraySamplePostRequest extends ApiPostTelegram {
      *
      * @return フィールド[status]に格納されている値
      */
-    public ArrayList<EnumStatus> getStatus() {
+    public ArrayList<StatusObject> getStatus() {
         return this.fStatus;
     }
 
@@ -88,7 +48,7 @@ public class PostEnumStatusArraySamplePostRequest extends ApiPostTelegram {
      * @return フィールド[status]の型名文字列
      */
     public static String typeStatus() {
-        return "java.util.ArrayList<blanco.sample.EnumStatus>";
+        return "java.util.ArrayList<blanco.sample.StatusObject>";
     }
 
     /**
@@ -102,8 +62,7 @@ public class PostEnumStatusArraySamplePostRequest extends ApiPostTelegram {
     public String toString() {
         java.lang.String buf = "";
         buf = buf + "blanco.sample.PostEnumStatusArraySamplePostRequest[";
-        buf = buf + "id=" +  this.fId;
-        buf = buf + ",status=" +  this.fStatus;
+        buf = buf + "status=" +  this.fStatus;
         buf = buf + "]";
         return buf;
     }
