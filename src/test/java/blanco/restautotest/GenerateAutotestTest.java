@@ -1,11 +1,12 @@
 package blanco.restautotest;
 
+import java.io.IOException;
+
+import org.junit.jupiter.api.Test;
+
 import blanco.restautotest.task.BlancoRestAutotestProcessImpl;
 import blanco.restautotest.task.valueobject.BlancoRestAutotestProcessInput;
 import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
-import org.junit.Test;
-
-import java.io.IOException;
 
 public class GenerateAutotestTest {
     @Test

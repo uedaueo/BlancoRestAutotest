@@ -1,15 +1,16 @@
 package blanco.restautotest;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class JacksonSerializeTest {
 
@@ -18,7 +19,7 @@ public class JacksonSerializeTest {
     }
 
     @Test
-    @Ignore
+    @Disabled
     public void serial() {
         MyData myData = new MyData();
         myData.myArray.add(10L);
@@ -43,7 +44,7 @@ public class JacksonSerializeTest {
     fieldStructure.setExpect30(BlancoXmlBindingUtil.getTextContent(elementList, "Expect30"));
      */
     @Test
-    @Ignore
+    @Disabled
     public void myTest() {
         for (int i = 31; i < 201; i++) {
             System.out.println("fieldStructure.setExpect" + i + "(BlancoXmlBindingUtil.getTextContent(elementList, \"Expect" + i + "\"));");

@@ -1,13 +1,12 @@
 package blanco.restautotest;
 
-import blanco.sample.EnumStatus;
-import org.junit.Test;
-
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import blanco.sample.EnumStatus;
 
 public class JacksonEnumTest {
 

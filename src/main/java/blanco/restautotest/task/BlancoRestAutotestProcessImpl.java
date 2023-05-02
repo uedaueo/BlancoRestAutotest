@@ -153,7 +153,6 @@ public class BlancoRestAutotestProcessImpl implements BlancoRestAutotestProcess 
 
             // ソースコードを生成する
             final BlancoRestAutotestXml2JavaClass xml2JavaClass = new BlancoRestAutotestXml2JavaClass();
-            xml2JavaClass.setEncoding(input.getEncoding());
             xml2JavaClass.setVerbose(input.getVerbose());
             xml2JavaClass.setTargetStyleAdvanced(isTargetStyleAdvanced);
             xml2JavaClass.process(new File(strTarget), allTestCaseDataList);

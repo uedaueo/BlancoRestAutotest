@@ -9,16 +9,14 @@
  */
 package blanco.restautotest;
 
-import blanco.cg.BlancoCgObjectFactory;
-import blanco.cg.BlancoCgSupportedLang;
-import blanco.cg.valueobject.BlancoCgClass;
-import blanco.cg.valueobject.BlancoCgSourceFile;
-import blanco.restautotest.constants.BlancoRestAutotestConstants;
-import blanco.restautotest.message.BlancoRestAutotestMessage;
-import blanco.restautotest.resourcebundle.BlancoRestAutotestResourceBundle;
-import blanco.restautotest.valueobject.BlancoRestAutotestInputResultFieldStructure;
-import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
-import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseFieldStructure;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
@@ -26,13 +24,9 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.json.JsonMapper;
 
-import java.io.*;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import blanco.restautotest.valueobject.BlancoRestAutotestTestCaseData;
 
 /**
  * バリューオブジェクト用中間XMLファイルから Javaソースコードを自動生成するクラス。
@@ -43,47 +37,6 @@ import java.util.List;
  * @author Kinoko Matsumoto 2017.09.01
  */
 public class BlancoRestAutotestXml2JavaClass {
-    /**
-     * メッセージ。
-     */
-    private final BlancoRestAutotestMessage fMsg = new BlancoRestAutotestMessage();
-
-    /**
-     * blancoValueObjectのリソースバンドルオブジェクト。
-     */
-    private final BlancoRestAutotestResourceBundle fBundle = new BlancoRestAutotestResourceBundle();
-
-    /**
-     * 入力シートに期待するプログラミング言語
-     */
-    private int fSheetLang = BlancoCgSupportedLang.JAVA;
-
-    /**
-     * 内部的に利用するblancoCg用ファクトリ。
-     */
-    private BlancoCgObjectFactory fCgFactory = null;
-
-    /**
-     * 内部的に利用するblancoCg用ソースファイル情報。
-     */
-    private BlancoCgSourceFile fCgSourceFile = null;
-
-    /**
-     * 内部的に利用するblancoCg用クラス情報。
-     */
-    private BlancoCgClass fCgClass = null;
-
-    /**
-     * 自動生成するソースファイルの文字エンコーディング。
-     */
-    private String fEncoding = null;
-
-    public void setEncoding(final String argEncoding) {
-        fEncoding = argEncoding;
-    }
-
-    private boolean fIsXmlRootElement = false;
-
     /**
      * ソースコード生成先ディレクトリのスタイル
      */
@@ -106,8 +59,6 @@ public class BlancoRestAutotestXml2JavaClass {
     public boolean isVerbose() {
         return this.fVerbose;
     }
-
-    private int testcaseMax = 0;
 
     /**
      * バリューオブジェクトを表現する中間XMLファイルから、Javaソースコードを自動生成します。
@@ -135,11 +86,12 @@ public class BlancoRestAutotestXml2JavaClass {
         System.out.println("testCaseData2Json : " + fileBlancoMain.getAbsolutePath());
         System.out.println("targetFilePath: " + argDirectoryTarget.getAbsolutePath());
 
-        for (BlancoRestAutotestTestCaseData testCaseData : argAllTestCaseData) {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-            mapper.configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true);
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+        for (BlancoRestAutotestTestCaseData testCaseData : argAllTestCaseData) {            
+            ObjectMapper mapper = JsonMapper.builder()
+            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+            .configure(MapperFeature.SORT_PROPERTIES_ALPHABETICALLY, true)
+            .serializationInclusion(JsonInclude.Include.NON_NULL)
+            .build();
             DefaultPrettyPrinter printer = new DefaultPrettyPrinter();
             printer.indentArraysWith(DefaultIndenter.SYSTEM_LINEFEED_INSTANCE);
             String requestJson = mapper.writer(printer).writeValueAsString(testCaseData.getInput());
